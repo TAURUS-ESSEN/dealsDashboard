@@ -1,0 +1,82 @@
+[
+  {
+    "userKey": "usr_001",
+    "fullName": "Ivan Petrov",
+    "role": "Sales Manager",
+    "email": "ivan.petrov@example.com",
+    "avatarUrl": "https://i.pravatar.cc/96?img=11",
+    "active": "true",
+    "createdAt": "2025-08-01T09:00:00Z",
+    "id": "1"
+  },
+  {
+    "userKey": "usr_002",
+    "fullName": "Marta Silva",
+    "role": "Account Executive",
+    "email": "marta.silva@example.com",
+    "avatarUrl": "https://i.pravatar.cc/96?img=32",
+    "active": "yes",
+    "createdAt": "2025-08-15",
+    "id": "2"
+  },
+  {
+    "userKey": "usr_003",
+    "fullName": "  Lena Hoffmann ",
+    "role": "Customer Success",
+    "email": "lena.hoffmann@example.com ",
+    "avatarUrl": "",
+    "active": "true",
+    "createdAt": "2025/09/05",
+    "id": "3"
+  },
+  {
+    "userKey": "usr_004",
+    "fullName": "Noah Kim",
+    "role": "Sales Ops",
+    "email": "noah.kim@bad",
+    "avatarUrl": "https://i.pravatar.cc/96?img=52",
+    "active": "false",
+    "createdAt": "2025-10-10T10:00:00Z",
+    "id": "4"
+  },
+  {
+    "userKey": "usr_005",
+    "fullName": "Ava Johnson",
+    "role": "",
+    "email": "ava.johnson@example.com",
+    "avatarUrl": "https://i.pravatar.cc/96?img=5",
+    "active": "true",
+    "createdAt": "2026-01-03T12:00:00Z",
+    "id": "5"
+  },
+  {
+    "userKey": "usr_006",
+    "fullName": "Sofia Marin",
+    "role": "Account Manager",
+    "email": "sofia.marin@example.com",
+    "avatarUrl": "https://i.pravatar.cc/96?img=47",
+    "active": "true",
+    "createdAt": "2026-02-01T09:00:00Z",
+    "id": "6"
+  },
+  {
+    "userKey": "usr_007",
+    "fullName": "Max Bauer",
+    "role": "Enterprise Sales",
+    "email": "max.bauer@example.com",
+    "avatarUrl": "https://i.pravatar.cc/96?img=12",
+    "active": "true",
+    "createdAt": "2026/02/14",
+    "id": "7"
+  },
+  {
+    "userKey": "usr_008",
+    "fullName": "Priya Nair",
+    "role": "Sales Development",
+    "email": "priya.nair@example.com",
+    "avatarUrl": "",
+    "active": "true",
+    "createdAt": "2026-03-07T10:00:00Z",
+    "id": "8"
+  }
+]

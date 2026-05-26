@@ -1,0 +1,43 @@
+.presetBtn {
+  @apply mx-1 rounded border border-gray-400 px-2 py-1 text-gray-300 hover:bg-amber-600 hover:text-white;
+}
+
+.activePreset {
+  @apply border-[#eb7001] bg-[#eb7001] text-white;
+}
+
+.editBtn {
+  @apply my-1 w-16 rounded bg-amber-500 text-white hover:bg-amber-400;
+}
+
+.sortBtn {
+  @apply font-semibold underline underline-offset-4;
+}
+
+.sortBtnActive {
+  @apply text-amber-500 decoration-amber-500;
+}
+
+.btnCancel {
+  @apply min-w-20 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 duration-300 hover:bg-gray-100;
+}
+
+.btnSave {
+  @apply rounded-md border border-[#eb7001] bg-[#eb7001] px-3 py-2 text-sm font-semibold text-white duration-300 hover:bg-amber-600 disabled:border-gray-200 disabled:bg-gray-200 disabled:text-gray-400;
+}
+
+.btnDanger {
+  @apply rounded-md border border-red-600 bg-red-600 px-3 py-2 text-sm font-semibold text-white duration-300 hover:bg-red-700;
+}
+
+.activeRow {
+  @apply border-l-4 border-l-orange-500 bg-orange-50 font-semibold;
+}
+
+.sidebarActive {
+  @apply text-[#eb7001];
+}
+
+.clientsTable td {
+  @apply p-2 text-lg
+}

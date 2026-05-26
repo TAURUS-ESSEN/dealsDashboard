@@ -1,0 +1,152 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem 1rem;
+  overflow-y: auto;
+  background-color: rgba(13, 17, 23, 0.68);
+  animation: overlayIn 0.18s ease-out forwards;
+}
+
+.modalContent {
+  width: min(92vw, 430px);
+  max-height: 90vh;
+  overflow: hidden;
+  border: 1px solid rgba(235, 112, 1, 0.28);
+  border-radius: 8px;
+  background-color: #f8fafc;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  animation: contentIn 0.14s ease-out forwards;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(235, 112, 1, 0.25);
+  background: #1f242b;
+}
+
+.modalTitle {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.modalCloseButton {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e4e4e7;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.modalCloseButton:hover {
+  background: #eb7001;
+  color: white;
+}
+
+.modalBody {
+  max-height: calc(90vh - 58px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+}
+
+.modalContent input,
+.modalContent select,
+.modalContent textarea {
+  @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900;
+}
+
+.modalContent input[type="radio"],
+.modalContent input[type="checkbox"] {
+  width: auto;
+}
+
+.modalContent input:focus,
+.modalContent select:focus,
+.modalContent textarea:focus {
+  outline: none;
+  border-color: #eb7001;
+  box-shadow: 0 0 0 3px rgba(235, 112, 1, 0.16);
+}
+
+.modalForm {
+  @apply flex flex-col gap-4;
+  padding-bottom: 0.25rem;
+}
+
+.modalSection {
+  @apply rounded-lg border border-gray-200 bg-white p-4;
+}
+
+.modalSectionTitle {
+  @apply mb-3 text-xs font-bold uppercase text-gray-500;
+}
+
+.modalField {
+  @apply flex flex-col gap-1 text-sm font-semibold text-gray-700;
+}
+
+.modalFieldGrid {
+  @apply grid gap-3 sm:grid-cols-2;
+}
+
+.modalError {
+  @apply text-sm font-medium text-red-600;
+}
+
+.modalActions {
+  @apply sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t border-gray-200 bg-slate-50 px-4 py-3;
+}
+
+.modalChoiceGroup {
+  @apply grid gap-2 sm:grid-cols-2;
+}
+
+.modalChoice {
+  @apply flex items-center gap-2 rounded-md border border-gray-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-gray-700;
+}
+
+.modalHeader {
+  @apply flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-4;
+}
+
+.modalContent :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid rgba(235, 112, 1, 0.45);
+  outline-offset: 2px;
+}

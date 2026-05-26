@@ -1,0 +1,34 @@
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  @apply min-h-1 bg-[#282d34];
+}
+
+body,
+input {
+  font-family: "Glory", sans-serif;
+}
+
+table {
+  @apply text-sm;
+}
+
+th {
+  @apply p-2 text-left text-base font-medium text-gray-600;
+}
+
+td {
+  padding: 0.4em;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  @apply rounded border border-gray-400 bg-white p-1;
+}
