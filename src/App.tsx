@@ -23,7 +23,7 @@ import { buildDetailedInfo } from "./features/Dashboard/buildDetailedInfo";
 // import { DebugInfo } from "./components/DebugInfo";
 
 export const App = () => {
-  const { refreshData, errors, clients, users, deals, tasks } = useLoadInitialData();
+  const { refreshData, errors, clients, users, deals, tasks, isLoading, } = useLoadInitialData();
   const { filters, handleFiltersState, sortBy, sortDirection, onPreset, sortColumn } = useFilters();
   const { toasts, createToast, removeToast } = useToasts();
   const { modal, openModal, closeModal } = useModal();
@@ -90,6 +90,7 @@ export const App = () => {
             sortColumn,
             isDetailsOpen,
             openModal,
+            isLoading,
           }}
         />
         <DashboardDetails detailedInfo={detailedInfo} openModal={openModal} closeDetails={closeDetails} />

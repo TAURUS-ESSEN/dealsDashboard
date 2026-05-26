@@ -9,6 +9,7 @@ type Props = {
   sortDirection: "asc" | "desc";
   sortColumn: string | null;
   isCompact: boolean;
+  isLoading: boolean;
 };
 
 export const DashboardTable = ({
@@ -19,6 +20,7 @@ export const DashboardTable = ({
   sortDirection,
   sortColumn,
   isCompact,
+  isLoading,
 }: Props) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300 bg-white">
@@ -98,14 +100,23 @@ export const DashboardTable = ({
           </tr>
         </thead>
         <tbody>
-          {filteredData.length === 0 && (
+          {isLoading && (
+            <tr>
+              <td colSpan={isCompact ? 7 : 8} className="px-4 py-8 text-center font-semibold text-slate-700">
+                Loading data...
+              </td>
+            </tr>
+          )}
+
+          {!isLoading && filteredData.length === 0 && (
             <>
               <tr>
                 <td colSpan={isCompact ? 7 : 8}>No data. Change filter request.</td>
               </tr>
             </>
           )}
-          {filteredData.length !== 0 &&
+          {!isLoading &&
+            filteredData.length !== 0 &&
             filteredData.map((row) => (
               <tr
                 className={`border-b border-t border-gray-200 even:bg-gray-100 hover:bg-amber-100 duration-300 ${

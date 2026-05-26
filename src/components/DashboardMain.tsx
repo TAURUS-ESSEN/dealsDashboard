@@ -24,6 +24,7 @@ type Props = {
   sortColumn: string | null;
   isDetailsOpen: boolean;
   handleFiltersState: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  isLoading:boolean
 };
 
 export const DashboardMain = ({}: Props) => {
@@ -39,6 +40,7 @@ export const DashboardMain = ({}: Props) => {
     sortColumn,
     isDetailsOpen,
     users,
+    isLoading,
   }: Props = useOutletContext();
   
   const { page, pageSize, totalPages, startIndex, endIndex, startItem, endItem, setPage, setPageSize } =
@@ -79,6 +81,7 @@ export const DashboardMain = ({}: Props) => {
         sortDirection={sortDirection}
         sortColumn={sortColumn}
         isCompact={isDetailsOpen}
+        isLoading = {isLoading}
       />
       <DashboardPagination
         page={page}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import type { Client } from "../types/client";
 import type { User } from "../types/users";
 import type { Deal } from "../types/deals";
@@ -15,13 +15,11 @@ export const useLoadInitialData = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<ApiErrors>({});
 
-  const refreshData = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         const fetchedClientsData: Client[] = await loadClients();
         setClients(fetchedClientsData);
@@ -55,21 +53,40 @@ export const useLoadInitialData = () => {
       try {
         const fetchedTaskData: Task[] = await loadTasks();
         setTasks(fetchedTaskData);
+        setIsLoading(true)
       } catch (error) {
         if (error instanceof Error) {
           setErrors((prev) => ({ ...prev, tasks: "Error by loading tasks data" }));
           console.log(`Error by loading tasks data - ${error.message}`);
         }
+      } 
+      finally {
+        setIsLoading(false)
+      }
+    };
+    fetchData();
+  }, []);
+
+  const refreshData = async () => {
+    try {
+      setIsLoading(true);
+      const fetchedClientsData: Client[] = await loadClients();
+      setClients(fetchedClientsData);
+      const fetchedUsersData: User[] = await loadUsers();
+      setUsers(fetchedUsersData);
+      const fetchedDealsData: Deal[] = await loadDeals();
+      setDeals(fetchedDealsData);
+      const fetchedTaskData: Task[] = await loadTasks();
+      setTasks(fetchedTaskData);
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrors((prev) => ({ ...prev, refresh: "Error by resfreshing data" }));
+        console.log(`Error by refreshing data - ${error.message}`);
       }
     } finally {
       setIsLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
-
+  };
   return {
     refreshData,
     errors,
