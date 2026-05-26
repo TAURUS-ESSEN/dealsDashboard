@@ -6,7 +6,7 @@ The app simulates a small sales pipeline system. Deals, clients, tasks and manag
 
 ## Screenshots
 
-![Deals dashboard](./assets/screenshots/dashboard.webp)
+![Deals dashboard](./assets/dashboard.webp)
 
 ## Features
 
