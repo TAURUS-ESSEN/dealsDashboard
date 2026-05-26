@@ -4,9 +4,13 @@ A CRM/dashboard project built with React, TypeScript and Vite.
 
 The app simulates a small sales pipeline system. Deals, clients, tasks and managers are loaded from MockAPI, normalized from dirty API data, and transformed into dashboard view models for filtering, sorting, pagination, details panels and CRUD actions.
 
+## Live Demo
+
+[Open the deployed app](https://deals-dashboard-gules.vercel.app/)
+
 ## Screenshots
 
-![Deals dashboard](./assets/dashboard.webp)
+![Deals dashboard](./src/assets/dashboard.webp)
 
 ## Features
 
@@ -92,3 +96,51 @@ Completed:
 
 - Deals dashboard
 - Summary cards
+- Filters and presets
+- Sorting
+- Pagination
+- Details panel
+- Deal CRUD
+- Task CRUD
+- Client edit and missing-client creation flow
+- Manager CRUD flow
+- Toasts and modal system
+- React Router base setup
+
+Planned:
+
+- Dedicated clients module
+- Problems / data quality module
+- More portfolio polish
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the dev server:
+
+```bash
+npm run dev
+```
+
+Run TypeScript checks:
+
+```bash
+npm run typecheck
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+## Why This Project
+
+This project is focused on practical frontend architecture, not only UI rendering.
+
+The main goal was to practice building a realistic React application where API data is imperfect, entities are connected, forms update backend data, and the dashboard displays derived business information instead of storing table rows directly.
