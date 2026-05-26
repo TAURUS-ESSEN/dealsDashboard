@@ -1,16 +1,94 @@
-# React + Vite
+# Deals Dashboard CRM
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A CRM/dashboard project built with React, TypeScript and Vite.
 
-Currently, two official plugins are available:
+The app simulates a small sales pipeline system. Deals, clients, tasks and managers are loaded from MockAPI, normalized from dirty API data, and transformed into dashboard view models for filtering, sorting, pagination, details panels and CRUD actions.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Screenshots
 
-## React Compiler
+![Deals dashboard](./assets/screenshots/dashboard.webp)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- Deals dashboard with table, summary cards and details panel
+- Dirty API data normalization before usage
+- Derived dashboard rows assembled from deals, clients, managers and tasks
+- Deal create, edit and delete flows
+- Client edit and missing-client creation flow
+- Task create, edit and delete flows
+- Manager create, edit and delete flow
+- Filters, presets, sorting and pagination
+- Probability bar with status-based colors
+- Toast notifications for create, update and delete actions
+- Reusable modal system
+- React Router layout with separate app sections
+- TypeScript-first data contracts
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Hook Form
+- React Router
+- Lucide React
+- MockAPI
+
+## Architecture
+
+The project separates raw API data, normalized entities and UI view models.
+
+```txt
+MockAPI
+  -> raw API loaders
+  -> normalization layer
+  -> normalized app state
+  -> derived dashboard rows
+  -> UI components
+  -> action hooks
+  -> API mappers
+  -> MockAPI mutations
+```
+
+Important project boundaries:
+
+- Raw API data is not stored in React state
+- State stores normalized entities
+- Forms do not call API directly
+- Forms call callbacks provided by the app layer
+- Action hooks handle mapping, API calls and data refresh
+- `DashboardRow` is not an API entity, it is a view model assembled from several entities
+
+## Project Structure
+
+```txt
+src/api                    API functions
+src/service                Raw loading functions
+src/normalized             Data normalization
+src/types                  TypeScript entity types
+src/utils                  API mappers and helpers
+src/hooks                  Data loading, filters, actions, pagination
+src/features/Dashboard     Dashboard row/details builders
+src/components             UI components
+src/components/modal       Modal components
+src/styles                 Global component styles
+```
+
+## Main Data Model
+
+The dashboard works with four main entities:
+
+- `clients`
+- `deals`
+- `tasks`
+- `users / managers`
+
+The table rows are derived from these entities. A deal row may include client info, owner info, task info, probability, status and calculated issue flags.
+
+## Current Status
+
+Completed:
+
+- Deals dashboard
+- Summary cards
