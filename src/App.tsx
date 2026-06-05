@@ -30,6 +30,7 @@ export const App = () => {
   const [activeRow, setActiveRow] = useState<string | null>(null);
 
   const [detailedDealId, setDetailedDealId] = useState<string | null>(null);
+  const [isDetailsManuallyClosed, setIsDetailsManuallyClosed] = useState(false);
 
   const tableData: DashboardRow[] = useMemo(() => {
     return buildDashboardRows(clients, users, deals, tasks);
@@ -39,7 +40,7 @@ export const App = () => {
   }, [tableData, filters]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || isDetailsManuallyClosed) return;
 
     if (filteredData.length === 0) {
       setDetailedDealId(null);
@@ -54,7 +55,7 @@ export const App = () => {
       setDetailedDealId(firstDealKey);
       setActiveRow(firstDealKey);
     }
-  }, [isLoading, filteredData, detailedDealId]);
+  }, [isLoading, filteredData, detailedDealId, isDetailsManuallyClosed]);
 
   const detailedInfo: DetailedInfo | null = buildDetailedInfo(
     detailedDealId,
@@ -81,6 +82,7 @@ export const App = () => {
   const closeDetails = useCallback((): void => {
     setDetailedDealId(null);
     setActiveRow(null);
+    setIsDetailsManuallyClosed(true);
   }, []);
   const isDetailsOpen: boolean = Boolean(detailedInfo?.row);
 
