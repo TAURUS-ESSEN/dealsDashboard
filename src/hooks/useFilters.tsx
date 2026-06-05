@@ -38,6 +38,6 @@ export const useFilters = () => {
   };
 
   const sortDirection = filters.sortDirection;
-  const sortColumn = filters.sortBy
-  return { filters, handleFiltersState, sortBy, onPreset, sortDirection, sortColumn  };
+  const sortColumn = filters.sortBy;
+  return { filters, handleFiltersState, sortBy, onPreset, sortDirection, sortColumn };
 };

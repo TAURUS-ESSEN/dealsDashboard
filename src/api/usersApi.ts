@@ -1,12 +1,15 @@
 import { URL_USERS_API } from "../constants/urls";
 import { requestJson, requestVoid, jsonOption } from "./httpClient";
 import type { NewUserToSave, UserToSave } from "../types/users";
-
+type Props = {
+  id: string;
+  updatedUser: UserToSave;
+};
 export const loadUsersDataApi = async () => {
   return await requestJson(URL_USERS_API, "loading users data");
 };
 
-export const editUserApi = async (id: string, updatedUser: UserToSave): Promise<void> => {
+export const editUserApi = async ({id, updatedUser}:Props): Promise<void> => {
   await requestVoid(`${URL_USERS_API}/${id}`, "editing users data", jsonOption("PUT", updatedUser));
 };
 

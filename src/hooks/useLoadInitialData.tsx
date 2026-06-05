@@ -3,75 +3,92 @@ import type { Client } from "../types/client";
 import type { User } from "../types/users";
 import type { Deal } from "../types/deals";
 import type { Task } from "../types/tasks";
-import type { ApiErrors } from "../types/api";
+import type { InitialDataErrors } from "../types/api";
 import { loadClients } from "../normalized/normalizedClients";
 
 import { loadUsers } from "../normalized/normalizeUsers";
 import { loadDeals } from "../normalized/normalizedDeals";
 import { loadTasks } from "../normalized/normalizeTasks";
+import { useQuery } from "@tanstack/react-query";
 
 export const useLoadInitialData = () => {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errors, setErrors] = useState<ApiErrors>({});
+  const [errors, setErrors] = useState<InitialDataErrors>({});
 
-  const refreshData = useCallback(async () => {
-    setIsLoading(true);
+  const {
+    data: clients = [],
+    error: clientsError,
+    isError: isClientsError,
+    isPending: clientsPending,
+  } = useQuery<Client[]>({
+    queryKey: ["clients"],
+    queryFn: loadClients,
+  });
 
-    try {
-      try {
-        const fetchedClientsData: Client[] = await loadClients();
-        setClients(fetchedClientsData);
-      } catch (error) {
-        if (error instanceof Error) {
-          setErrors((prev) => ({ ...prev, clients: "Error by loading clients data" }));
-          console.log(`Error by loading clients data - ${error.message}`);
-        }
-      }
+  const {
+    data: deals = [],
+    error: dealsError,
+    isError: isDealsError,
+    isPending: dealsPending,
+    // isFetching,
+  } = useQuery<Deal[]>({
+    queryKey: ["deals"],
+    queryFn: loadDeals,
+  });
 
-      try {
-        const fetchedUsersData: User[] = await loadUsers();
-        setUsers(fetchedUsersData);
-      } catch (error) {
-        if (error instanceof Error) {
-          setErrors((prev) => ({ ...prev, users: "Error by loading users data" }));
-          console.log(`Error by loading users data - ${error.message}`);
-        }
-      }
+  const {
+    data: tasks = [],
+    error: tasksError,
+    isError: isTasksError,
+    isPending: tasksPending,
+  } = useQuery<Task[]>({
+    queryKey: ["tasks"],
+    queryFn: loadTasks,
+  });
 
-      try {
-        const fetchedDealsData: Deal[] = await loadDeals();
-        setDeals(fetchedDealsData);
-      } catch (error) {
-        if (error instanceof Error) {
-          setErrors((prev) => ({ ...prev, deals: "Error by loading deals data" }));
-          console.log(`Error by loading deals data - ${error.message}`);
-        }
-      }
-
-      try {
-        const fetchedTaskData: Task[] = await loadTasks();
-        setTasks(fetchedTaskData);
-      } catch (error) {
-        if (error instanceof Error) {
-          setErrors((prev) => ({ ...prev, tasks: "Error by loading tasks data" }));
-          console.log(`Error by loading tasks data - ${error.message}`);
-        }
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const {
+    data: users = [],
+    error: usersError,
+    isError: isUsersError,
+    isPending: usersPending,
+  } = useQuery<User[]>({
+    queryKey: ["users"],
+    queryFn: loadUsers,
+  });
 
   useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+    const nextErrors: InitialDataErrors = {};
 
+    if (isClientsError && clientsError) {
+      nextErrors.clients = `Error by loading clients data - ${clientsError.message}`;
+    }
+
+    if (isDealsError && dealsError) {
+      nextErrors.deals = `Error by loading deals data - ${dealsError.message}`;
+    }
+
+    if (isTasksError && tasksError) {
+      nextErrors.tasks = `Error by loading tasks data - ${tasksError.message}`;
+    }
+
+    if (isUsersError && usersError) {
+      nextErrors.users = `Error by loading users data - ${usersError.message}`;
+    }
+
+    setErrors(nextErrors);
+  }, [
+    isClientsError,
+    clientsError,
+    isDealsError,
+    dealsError,
+    isTasksError,
+    tasksError,
+    isUsersError,
+    usersError,
+  ]);
+ 
+  const isLoading = clientsPending || dealsPending || tasksPending || usersPending;
+  
   return {
-    refreshData,
     errors,
     clients,
     users,

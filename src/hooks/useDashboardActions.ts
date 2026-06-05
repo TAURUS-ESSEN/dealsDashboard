@@ -1,9 +1,11 @@
-import type { Client, NewClient, ClientToSave, NewClientToSave } from "../types/client";
+import type { Client, NewClient, NewClientToSave } from "../types/client";
 import { createClientApi, editClientApi } from "../api/clientsApi";
-import type { Deal, DealToSave, NewDealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
+import type { Deal, DealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
 import type { NewTaskToSave, Task } from "../types/tasks";
 import { editDealApi, createDealApi, deleteDealApi } from "../api/dealsApi";
 import type { DetailedInfo, ToastType } from "../types/ui";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import {
   mapClientToSaveData,
   mapDealToSaveData,
@@ -15,16 +17,56 @@ import { editTaskApi, createTaskApi, deleteTaskApi } from "../api/tasksApi";
 type UseDashboardActionsArgs = {
   detailedInfo: DetailedInfo | null;
   createToast: (message: string, type: ToastType) => void;
-  refreshData: () => Promise<void>;
   clearDetailedDeal: () => void;
 };
 
 export const useDashboardActions = ({
   detailedInfo,
   createToast,
-  refreshData,
   clearDetailedDeal,
 }: UseDashboardActionsArgs) => {
+  const queryClient = useQueryClient();
+
+  const createClientMutation = useMutation({
+    mutationFn: createClientApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["clients"] }),
+  });
+
+  const editClientMutation = useMutation({
+    mutationFn: editClientApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["clients"] }),
+  });
+
+  const createDealMutation = useMutation({
+    mutationFn: createDealApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["deals"] }),
+  });
+
+  const editDealMutation = useMutation({
+    mutationFn: editDealApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["deals"] }),
+  });
+
+  const deleteDealMutation = useMutation({
+    mutationFn: deleteDealApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["deals"] }),
+  });
+
+  const createTaskMutation = useMutation({
+    mutationFn: createTaskApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const editTaskMutation = useMutation({
+    mutationFn: editTaskApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: deleteTaskApi,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
   const handleSaveClient = async (id: string | null, client: Client | NewClient): Promise<void> => {
     let toastMessage = "";
     let toastType: ToastType = "update";
@@ -32,47 +74,44 @@ export const useDashboardActions = ({
     if (id === null) {
       if (!detailedInfo?.deal || !client.clientKey) return;
 
-      await createClientApi(client as NewClientToSave);
+      await createClientMutation.mutateAsync(client as NewClientToSave);
       const updatedDeal = {
         ...detailedInfo.deal,
         clientKey: client.clientKey,
       };
 
       const data: DealToSave = mapDealToSaveData(updatedDeal);
-      await editDealApi(detailedInfo.deal.id, data);
+      await editDealMutation.mutateAsync({ id: detailedInfo.deal.id, updatedDeal: data });
       toastMessage = "Client successfully created";
       toastType = "create";
     } else {
       const data = mapClientToSaveData(client as Client);
-      await editClientApi(id, data as ClientToSave);
+      await editClientMutation.mutateAsync({ id, updatedClient: data });
       toastMessage = "Client successfully updated";
     }
 
-    await refreshData();
     createToast(toastMessage, toastType);
   };
 
   const handleCreateDeal = async (data: NewDealFormState): Promise<void> => {
     if (data.clientType === "old") {
       const deal = mapNewDealToSaveData(data as NewDealFormState);
-      await createDealApi(deal);
+      await createDealMutation.mutateAsync(deal);
     }
 
     if (data.clientType === "new") {
       const dealAndClient: DealWithClientToSave = mapNewDealWithClientToSaveData(data);
-      await createClientApi(dealAndClient.newClient);
+      await createClientMutation.mutateAsync(dealAndClient.newClient);
 
-      await createDealApi(dealAndClient.newDeal);
+      await createDealMutation.mutateAsync(dealAndClient.newDeal);
     }
-    await refreshData();
     createToast("Deal successfully created", "create");
   };
 
   const handleUpdateDeal = async (id: string, deal: Deal): Promise<void> => {
     const data = mapDealToSaveData(deal as Deal);
-    await editDealApi(id, data);
+    await editDealMutation.mutateAsync({ id, updatedDeal: data });
 
-    await refreshData();
     createToast("Deal successfully updated", "update");
   };
 
@@ -82,15 +121,13 @@ export const useDashboardActions = ({
     let toastType: ToastType = "update";
 
     if (id !== null) {
-      await editTaskApi(id, data);
+      await editTaskMutation.mutateAsync({ id, updatedTask: data });
     } else {
-      console.log(id, data);
-      await createTaskApi(data);
+      await createTaskMutation.mutateAsync(data);
       toastMessage = "Task successfully created";
       toastType = "create";
     }
 
-    await refreshData();
     createToast(toastMessage, toastType);
   };
 
@@ -100,18 +137,16 @@ export const useDashboardActions = ({
     if (mode === "deal") {
       if (!detailedInfo?.deal) return;
 
-      await Promise.all(detailedInfo.dealTasks.map((task) => deleteTaskApi(task.id)));
-
-      await deleteDealApi(id);
+      await Promise.all(detailedInfo.dealTasks.map((task) => deleteTaskMutation.mutateAsync(task.id)));
+      await deleteDealMutation.mutateAsync(id);
       clearDetailedDeal();
       toastMessage = "Deal and related tasks deleted";
     }
     if (mode === "task") {
-      await deleteTaskApi(id);
+      await deleteTaskMutation.mutateAsync(id);
       toastMessage = "Task successfully deleted";
     }
 
-    await refreshData();
     createToast(toastMessage, "delete");
   };
   return {

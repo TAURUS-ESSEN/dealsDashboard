@@ -1,6 +1,7 @@
 import { MoveUp, MoveDown } from "lucide-react";
 import type { DashboardRow } from "../../types/dashboardRow";
 import { ProbabilityBar } from "../Probability";
+import { DashboardLoading } from "./DashboardLoading";
 type Props = {
   filteredData: DashboardRow[];
   onShow: (id: string) => void;
@@ -103,7 +104,7 @@ export const DashboardTable = ({
           {isLoading && (
             <tr>
               <td colSpan={isCompact ? 7 : 8} className="px-4 py-8 text-center font-semibold text-slate-700">
-                Loading data...
+                <DashboardLoading />
               </td>
             </tr>
           )}
@@ -119,15 +120,14 @@ export const DashboardTable = ({
             filteredData.length !== 0 &&
             filteredData.map((row) => (
               <tr
-                className={`border-b border-t border-gray-200 even:bg-gray-100 hover:bg-amber-100 duration-300 ${
+                className={`border-b border-t border-gray-200 even:bg-gray-100 hover:bg-amber-100 hover:cursor-pointer duration-300 ${
                   activeRow === row.dealKey ? "activeRow " : ""
                 }`}
                 key={row.id}
+                onClick={() => onShow(row.dealKey)}
               >
                 <td className="truncate whitespace-nowrap" title={row.dealTitle}>
-                  <button className="block w-full truncate text-left" onClick={() => onShow(row.dealKey)}>
-                    {row.dealTitle}
-                  </button>
+                  {row.dealTitle}
                 </td>
                 <td className="truncate whitespace-nowrap" title={row.clientName}>
                   {row.clientName}

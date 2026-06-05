@@ -4,3 +4,10 @@ export type ApiErrors = {
   deals?: string;
   users?: string;
 };
+
+export type InitialDataErrors = {
+  clients?: string;
+  tasks?: string;
+  deals?: string;
+  users?: string;
+};

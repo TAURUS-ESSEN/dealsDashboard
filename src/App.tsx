@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { useLoadInitialData } from "./hooks/useLoadInitialData";
@@ -23,15 +23,38 @@ import { buildDetailedInfo } from "./features/Dashboard/buildDetailedInfo";
 // import { DebugInfo } from "./components/DebugInfo";
 
 export const App = () => {
-  const { refreshData, errors, clients, users, deals, tasks, isLoading, } = useLoadInitialData();
+  const { errors, clients, users, deals, tasks, isLoading } = useLoadInitialData();
   const { filters, handleFiltersState, sortBy, sortDirection, onPreset, sortColumn } = useFilters();
   const { toasts, createToast, removeToast } = useToasts();
   const { modal, openModal, closeModal } = useModal();
   const [activeRow, setActiveRow] = useState<string | null>(null);
 
   const [detailedDealId, setDetailedDealId] = useState<string | null>(null);
-  const tableData: DashboardRow[] = buildDashboardRows(clients, users, deals, tasks);
-  const filteredData: DashboardRow[] = filterDashboardRows(tableData, filters);
+
+  const tableData: DashboardRow[] = useMemo(() => {
+    return buildDashboardRows(clients, users, deals, tasks);
+  }, [clients, users, deals, tasks]);
+  const filteredData: DashboardRow[] = useMemo(() => {
+    return filterDashboardRows(tableData, filters);
+  }, [tableData, filters]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (filteredData.length === 0) {
+      setDetailedDealId(null);
+      setActiveRow(null);
+      return;
+    }
+
+    const selectedRowExists = filteredData.some((row) => row.dealKey === detailedDealId);
+
+    if (!detailedDealId || !selectedRowExists) {
+      const firstDealKey = filteredData[0].dealKey;
+      setDetailedDealId(firstDealKey);
+      setActiveRow(firstDealKey);
+    }
+  }, [isLoading, filteredData, detailedDealId]);
 
   const detailedInfo: DetailedInfo | null = buildDetailedInfo(
     detailedDealId,
@@ -45,7 +68,6 @@ export const App = () => {
     useDashboardActions({
       detailedInfo,
       createToast,
-      refreshData,
       clearDetailedDeal: () => setDetailedDealId(null),
     });
 
@@ -54,7 +76,7 @@ export const App = () => {
     setActiveRow(id);
   };
 
-  const { handleUser, handleDeleteUser } = useUserActions({createToast, refreshData});
+  const { handleUser, handleDeleteUser } = useUserActions({ createToast });
 
   const closeDetails = useCallback((): void => {
     setDetailedDealId(null);
@@ -69,7 +91,7 @@ export const App = () => {
       closeDetails();
     }
   }, [location.pathname, closeDetails]);
- 
+
   return (
     <>
       <Toasts toasts={toasts} removeToast={removeToast} />

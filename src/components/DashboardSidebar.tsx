@@ -32,7 +32,8 @@ export const DashboardSidebar = ({ openModal, users }: Props) => {
       modalType: "createUser",
     },
   };
-  const primaryAction = actionByPath[location.pathname];
+  const primaryAction = actionByPath[location.pathname]  
+  if (!primaryAction) return null
 
   return (
     <div className="bg-[#192026] text-white   w-45 px-3 text-lg">
