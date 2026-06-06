@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { nanoid } from "nanoid";
 
@@ -27,6 +27,7 @@ type Props =
 export const TaskFormModal = (props: Props) => {
   const { closeModal, mode, onSave } = props;
   const formData: Task | EmptyTask = mode === "edit" ? props.task : emptyTaskFallback;
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -49,15 +50,25 @@ export const TaskFormModal = (props: Props) => {
       data.clientKey = props.row.clientKey;
       data.assigneeKey = props.row.ownerKey;
     }
-
-    await onSave(id, data as Task);
-    closeModal();
+    try {
+      await onSave(id, data as Task);
+      closeModal();
+    } catch (errors) {
+      if (errors instanceof Error) {
+        setSubmitError(
+          mode === "edit"
+            ? "Failed to update task. Please try again."
+            : "Failed to create task. Please try again.",
+        );
+      }
+    }
   };
 
   const renderErrors = createRenderErrors<EmptyTask>(errors);
 
   return (
     <Modal title={mode === "edit" ? "Edit task" : "Create task"} closeModal={closeModal}>
+      <div className="flex justify-center text-red-600">{submitError}</div>
       <form className="modalForm" onSubmit={handleSubmit(onSubmit)}>
         <div className="modalSection">
           <p className="modalSectionTitle">Task details</p>

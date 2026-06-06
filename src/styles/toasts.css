@@ -3,7 +3,7 @@
   top: calc(env(safe-area-inset-top) + 12px);
   right: 16px;
   transform: translateY(-8px);
-  z-index: 80;
+  z-index: 1001;
   width: min(92vw, 280px);
   display: flex;
   flex-direction: column;
@@ -155,5 +155,17 @@
 }
 
 .toast--delete .toastTitle {
+  color: #fca5a5;
+}
+
+.toast--error {
+  border-left-color: #dc2626;
+}
+
+.toast--error .toastIcon {
+  background: #dc2626;
+}
+
+.toast--error .toastTitle {
   color: #fca5a5;
 }

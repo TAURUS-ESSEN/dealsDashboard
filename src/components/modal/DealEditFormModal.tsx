@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Modal } from "./Modal";
@@ -6,7 +6,7 @@ import { Modal } from "./Modal";
 import type { User } from "../../types/users";
 import type { Deal } from "../../types/deals";
 import { VALID_DEAL_STAGES } from "../../constants/defaults";
-import {createRenderErrors} from '../../utils/renderErrors'
+import { createRenderErrors } from "../../utils/renderErrors";
 
 type Props = {
   closeModal: () => void;
@@ -22,28 +22,39 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<Deal>({ mode: "onTouched" });
-
+  const [submitError, setSubmitError] = useState<string | null>(null);
   useEffect(() => {
     reset(deal);
   }, []);
 
   const onSubmit = async (data: Deal) => {
-    data.updatedAt = new Date().toISOString().slice(0, 10);
-    await onUpdateDeal(data.id, data);
-    closeModal();
+    try {
+      data.updatedAt = new Date().toISOString().slice(0, 10);
+      await onUpdateDeal(data.id, data);
+      closeModal();
+    } catch (errors) {
+      if (errors instanceof Error) {
+        setSubmitError("Failed to update deal. Please try again.");
+      }
+    }
   };
 
   const renderErrors = createRenderErrors<Deal>(errors);
-  
+
   return (
     <Modal title="Edit deal" closeModal={closeModal}>
+       <div className="flex justify-center text-red-600">{submitError}</div>
+
       <form className="modalForm" onSubmit={handleSubmit(onSubmit)}>
         <div className="modalSection">
           <p className="modalSectionTitle">Deal overview</p>
           <div className="flex flex-col gap-3">
             <label className="modalField">
               Deal title
-              <input {...register("title", { required: "Deal title is required" })} placeholder="Enterprise CRM rollout" />
+              <input
+                {...register("title", { required: "Deal title is required" })}
+                placeholder="Enterprise CRM rollout"
+              />
             </label>
             {renderErrors("title")}
 

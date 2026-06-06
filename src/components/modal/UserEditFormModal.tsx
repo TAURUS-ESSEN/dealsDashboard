@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Modal } from "./Modal";
@@ -22,6 +22,7 @@ type Props =
 
 export const UserEditFormModal = (props: Props) => {
   const { closeModal, mode, onSaveUser } = props;
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const formData = mode === "edit" ? props.user : emptyUser;
   const {
     register,
@@ -35,17 +36,21 @@ export const UserEditFormModal = (props: Props) => {
   }, [formData, reset]);
 
   const onSubmit = async (data: User | EmptyUser) => {
-    await onSaveUser(data);
-    closeModal();
+    try {
+      await onSaveUser(data);
+      setSubmitError(null);
+      closeModal();
+    } catch (errors) {
+      if (errors instanceof Error) {
+        setSubmitError(mode === "edit" ? "Failed to update manager. Please try again." : "Failed to create manager. Please try again.");
+      }
+    }
   };
 
   const renderErrors = createRenderErrors<User>(errors);
 
   return (
-    <Modal
-      title={`${mode === "edit" ? `Edit manager` : "Create manager"}`}
-      closeModal={closeModal}
-    >
+    <Modal title={`${mode === "edit" ? `Edit manager` : "Create manager"}`} closeModal={closeModal}>
       <form className="modalForm" onSubmit={handleSubmit(onSubmit)}>
         <div className="modalHeader">
           <div>
@@ -61,7 +66,10 @@ export const UserEditFormModal = (props: Props) => {
 
           <label className="modalField">
             Full name
-            <input {...register("fullName", { required: "Full name is required" })} placeholder="Ivan Petrov" />
+            <input
+              {...register("fullName", { required: "Full name is required" })}
+              placeholder="Ivan Petrov"
+            />
           </label>
           {renderErrors("fullName")}
 
@@ -105,6 +113,7 @@ export const UserEditFormModal = (props: Props) => {
             {isSubmitting ? "Saving..." : mode === "edit" ? "Save changes" : "Create manager"}
           </button>
         </div>
+        <div className="flex justify-center text-red-600">{submitError}</div>
       </form>
     </Modal>
   );

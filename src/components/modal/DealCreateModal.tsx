@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
 import { Modal } from "./Modal";
+import { useState } from "react";
 
 import type { NewDealFormState } from "../../types/deals";
 import type { User } from "../../types/users";
 import type { Client } from "../../types/client";
 import { VALID_DEAL_STAGES, VALID_CLIENT_STATUSES } from "../../constants/defaults";
-import {createRenderErrors} from '../../utils/renderErrors'
+import { createRenderErrors } from "../../utils/renderErrors";
 
 type Props = {
   users: User[];
@@ -22,12 +23,18 @@ export const DealCreateModal = ({ users, clients, onCreateDeal, closeModal }: Pr
     formState: { errors, isDirty, isSubmitting, isValid },
   } = useForm<NewDealFormState>({ mode: "onTouched" });
   const clientType = watch("clientType");
-
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const renderErrors = createRenderErrors<NewDealFormState>(errors);
 
   const onSubmit = async (data: NewDealFormState): Promise<void> => {
-    await onCreateDeal(data);
-    closeModal();
+    try {
+      await onCreateDeal(data);
+      closeModal();
+    } catch (errors) {
+      if (errors instanceof Error) {
+        setSubmitError("Failed to create deal. Please try again.");
+      }
+    }
   };
 
   return (
@@ -38,7 +45,10 @@ export const DealCreateModal = ({ users, clients, onCreateDeal, closeModal }: Pr
           <div className="flex flex-col gap-3">
             <label className="modalField">
               Deal title
-              <input {...register("title", { required: "Deal title is required" })} placeholder="Enterprise CRM rollout" />
+              <input
+                {...register("title", { required: "Deal title is required" })}
+                placeholder="Enterprise CRM rollout"
+              />
             </label>
             {renderErrors("title")}
 
@@ -131,14 +141,20 @@ export const DealCreateModal = ({ users, clients, onCreateDeal, closeModal }: Pr
               <>
                 <label className="modalField">
                   Company
-                  <input {...register("company", { required: "Company is required" })} placeholder="Acme Corp" />
+                  <input
+                    {...register("company", { required: "Company is required" })}
+                    placeholder="Acme Corp"
+                  />
                 </label>
                 {renderErrors("company")}
 
                 <div className="modalFieldGrid">
                   <label className="modalField">
                     Industry
-                    <input {...register("industry", { required: "Industry is required" })} placeholder="SaaS" />
+                    <input
+                      {...register("industry", { required: "Industry is required" })}
+                      placeholder="SaaS"
+                    />
                   </label>
 
                   <label className="modalField">
@@ -171,7 +187,10 @@ export const DealCreateModal = ({ users, clients, onCreateDeal, closeModal }: Pr
                 <div className="modalFieldGrid">
                   <label className="modalField">
                     Phone
-                    <input {...register("phone", { required: "Phone is required" })} placeholder="+1 415 555 0198" />
+                    <input
+                      {...register("phone", { required: "Phone is required" })}
+                      placeholder="+1 415 555 0198"
+                    />
                   </label>
 
                   <label className="modalField">
@@ -231,10 +250,11 @@ export const DealCreateModal = ({ users, clients, onCreateDeal, closeModal }: Pr
           <button type="button" className="btnCancel" onClick={closeModal}>
             Cancel
           </button>
-          <button type="submit" disabled={!isDirty || !isValid || isSubmitting} className="btnSave">
+          <button type="submit" disabled={isSubmitting} className="btnSave">
             {isSubmitting ? "Creating..." : "Create deal"}
           </button>
         </div>
+        <div className="flex justify-center text-red-600">{submitError}</div>
       </form>
     </Modal>
   );

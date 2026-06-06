@@ -47,7 +47,7 @@ export type DetailedInfo = {
   dealTasks: Task[];
 };
 
-export type ToastType = "create" | "update" | "delete";
+export type ToastType = "create" | "update" | "delete" | "error";
 export type Toast = {
   id: number;
   message: string;

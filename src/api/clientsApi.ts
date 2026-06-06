@@ -11,7 +11,7 @@ export const loadClientsDataApi = async () => {
 };
 
 export const createClientApi = async (newClient: NewClientToSave): Promise<void> => {
-  await requestVoid(URL_CLIENTS_API, "creating client data", jsonOption("POST", newClient));
+  await requestVoid(`${URL_CLIENTS_API}`, "creating client data", jsonOption("POST", newClient));
 };
 
 export const editClientApi = async ({ id, updatedClient }: Props): Promise<void> => {

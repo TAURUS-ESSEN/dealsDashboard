@@ -1,5 +1,6 @@
 import { TriangleAlert } from "lucide-react";
 import { Modal } from "./Modal";
+import { useState } from "react";
 
 type Props = {
   title: string;
@@ -11,9 +12,17 @@ type Props = {
 };
 
 export const DeleteModal = ({ title, entityName, warningText, onConfirm, closeModal }: Props) => {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const deleteValue = async () => {
-    await onConfirm();
-    closeModal();
+    try {
+      await onConfirm();
+      closeModal();
+    } catch (error) {
+      if (error instanceof Error) {
+        setSubmitError("Failed to delete. Please try again.");
+      }
+    }
   };
 
   return (
@@ -39,6 +48,7 @@ export const DeleteModal = ({ title, entityName, warningText, onConfirm, closeMo
             Delete
           </button>
         </div>
+        <div className="flex justify-center text-red-600">{submitError}</div>
       </div>
     </Modal>
   );

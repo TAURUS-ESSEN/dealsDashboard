@@ -15,7 +15,7 @@ export const editTaskApi = async ({ id, updatedTask }: Props): Promise<void> => 
 };
 
 export const createTaskApi = async (newTask: NewTaskToSave): Promise<void> => {
-  await requestVoid(URL_TASKS_API, "error by task creating ", jsonOption("POST", newTask));
+  await requestVoid(`${URL_TASKS_API}/11112s`, "error by task creating ", jsonOption("POST", newTask));
 };
 
 export const deleteTaskApi = async (id: string): Promise<void> => {

@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { CheckCircle2, Pencil, Trash2, X } from "lucide-react";
+import { CheckCircle2, Pencil, Trash2, X, CircleX } from "lucide-react";
 import { useEffect } from "react";
 
 import type { Toast, ToastType } from "../types/ui";
@@ -13,12 +13,14 @@ const toastMeta: Record<ToastType, { title: string; Icon: typeof CheckCircle2 }>
   create: { title: "Created", Icon: CheckCircle2 },
   update: { title: "Updated", Icon: Pencil },
   delete: { title: "Deleted", Icon: Trash2 },
+  error: { title: "Error", Icon: CircleX },
 };
 
 const toastClass: Record<ToastType, string> = {
   create: "toast--create",
   update: "toast--update",
   delete: "toast--delete",
+  error: "toast--error",
 };
 
 export const Toasts = ({ toasts, removeToast }: Props) => {

@@ -74,45 +74,63 @@ export const useDashboardActions = ({
     if (id === null) {
       if (!detailedInfo?.deal || !client.clientKey) return;
 
-      await createClientMutation.mutateAsync(client as NewClientToSave);
-      const updatedDeal = {
-        ...detailedInfo.deal,
-        clientKey: client.clientKey,
-      };
+      try {
+        await createClientMutation.mutateAsync(client as NewClientToSave);
+        const updatedDeal = {
+          ...detailedInfo.deal,
+          clientKey: client.clientKey,
+        };
 
-      const data: DealToSave = mapDealToSaveData(updatedDeal);
-      await editDealMutation.mutateAsync({ id: detailedInfo.deal.id, updatedDeal: data });
-      toastMessage = "Client successfully created";
-      toastType = "create";
+        const data: DealToSave = mapDealToSaveData(updatedDeal);
+        await editDealMutation.mutateAsync({ id: detailedInfo.deal.id, updatedDeal: data });
+        toastMessage = "Client successfully created";
+        toastType = "create";
+      } catch (error) {
+        createToast("Failed to create client", "error");
+        throw error;
+      }
     } else {
-      const data = mapClientToSaveData(client as Client);
-      await editClientMutation.mutateAsync({ id, updatedClient: data });
-      toastMessage = "Client successfully updated";
+      try {
+        const data = mapClientToSaveData(client as Client);
+        await editClientMutation.mutateAsync({ id, updatedClient: data });
+        toastMessage = "Client successfully updated";
+      } catch (error) {
+        createToast("Failed to update client", "error");
+        throw error;
+      }
     }
 
     createToast(toastMessage, toastType);
   };
 
   const handleCreateDeal = async (data: NewDealFormState): Promise<void> => {
-    if (data.clientType === "old") {
-      const deal = mapNewDealToSaveData(data as NewDealFormState);
-      await createDealMutation.mutateAsync(deal);
-    }
+    try {
+      if (data.clientType === "old") {
+        const deal = mapNewDealToSaveData(data as NewDealFormState);
+        await createDealMutation.mutateAsync(deal);
+      }
+      if (data.clientType === "new") {
+        const dealAndClient: DealWithClientToSave = mapNewDealWithClientToSaveData(data);
+        await createClientMutation.mutateAsync(dealAndClient.newClient);
 
-    if (data.clientType === "new") {
-      const dealAndClient: DealWithClientToSave = mapNewDealWithClientToSaveData(data);
-      await createClientMutation.mutateAsync(dealAndClient.newClient);
-
-      await createDealMutation.mutateAsync(dealAndClient.newDeal);
+        await createDealMutation.mutateAsync(dealAndClient.newDeal);
+      }
+      createToast("Deal successfully created", "create");
+    } catch (error) {
+      createToast("Failed to create deal", "error");
+      throw error;
     }
-    createToast("Deal successfully created", "create");
   };
 
   const handleUpdateDeal = async (id: string, deal: Deal): Promise<void> => {
-    const data = mapDealToSaveData(deal as Deal);
-    await editDealMutation.mutateAsync({ id, updatedDeal: data });
-
-    createToast("Deal successfully updated", "update");
+    try {
+      const data = mapDealToSaveData(deal as Deal);
+      await editDealMutation.mutateAsync({ id, updatedDeal: data });
+      createToast("Deal successfully updated", "update");
+    } catch (error) {
+      createToast("Failed to update deal", "error");
+      throw error;
+    }
   };
 
   const handleTaskInfo = async (id: string | null, task: Task | NewTaskToSave): Promise<void> => {
@@ -121,11 +139,21 @@ export const useDashboardActions = ({
     let toastType: ToastType = "update";
 
     if (id !== null) {
-      await editTaskMutation.mutateAsync({ id, updatedTask: data });
+      try {
+        await editTaskMutation.mutateAsync({ id, updatedTask: data });
+      } catch (error) {
+        createToast("Failed to update task", "error");
+        throw error;
+      }
     } else {
-      await createTaskMutation.mutateAsync(data);
-      toastMessage = "Task successfully created";
-      toastType = "create";
+      try {
+        await createTaskMutation.mutateAsync(data);
+        toastMessage = "Task successfully created";
+        toastType = "create";
+      } catch (error) {
+        createToast("Failed to create task", "error");
+        throw error;
+      }
     }
 
     createToast(toastMessage, toastType);
@@ -136,15 +164,25 @@ export const useDashboardActions = ({
 
     if (mode === "deal") {
       if (!detailedInfo?.deal) return;
-
-      await Promise.all(detailedInfo.dealTasks.map((task) => deleteTaskMutation.mutateAsync(task.id)));
-      await deleteDealMutation.mutateAsync(id);
-      clearDetailedDeal();
-      toastMessage = "Deal and related tasks deleted";
+      try {
+        await Promise.all(detailedInfo.dealTasks.map((task) => deleteTaskApi(task.id)));
+        await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+        await deleteDealMutation.mutateAsync(id);
+        clearDetailedDeal();
+        toastMessage = "Deal and related tasks deleted";
+      } catch (error) {
+        createToast("Failed to delete deal", "error");
+        throw error;
+      }
     }
     if (mode === "task") {
-      await deleteTaskMutation.mutateAsync(id);
-      toastMessage = "Task successfully deleted";
+      try {
+        await deleteTaskMutation.mutateAsync(id);
+        toastMessage = "Task successfully deleted";
+      } catch (error) {
+        createToast("Failed to delete task", "error");
+        throw error;
+      }
     }
 
     createToast(toastMessage, "delete");

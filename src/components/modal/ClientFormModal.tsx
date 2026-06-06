@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { emptyClient } from "../../constants/fallBacks";
 import { nanoid } from "nanoid";
 import { Modal } from "./Modal";
 import { useEffect } from "react";
 import type { Client, NewClient, EmptyClient } from "../../types/client";
 import { VALID_CLIENT_STATUSES } from "../../constants/defaults";
-import {createRenderErrors} from '../../utils/renderErrors'
+import { createRenderErrors } from "../../utils/renderErrors";
 
 type Props =
   | {
@@ -22,6 +23,7 @@ type Props =
 
 export const ClientFormModal = (props: Props) => {
   const { closeModal, mode, onSave } = props;
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const formData = mode === "edit" ? props.client : emptyClient;
   const {
     register,
@@ -34,7 +36,6 @@ export const ClientFormModal = (props: Props) => {
     reset(formData);
   }, []);
 
-
   const renderErrors = createRenderErrors<EmptyClient>(errors);
 
   const onSubmit = async (data: EmptyClient | Client) => {
@@ -46,20 +47,34 @@ export const ClientFormModal = (props: Props) => {
       data.createdAt = new Date().toISOString().slice(0, 10);
       data.tags = [];
     }
-    await onSave(id, data as Client);
-    closeModal();
+    try {
+      await onSave(id, data as Client);
+      closeModal();
+    } catch (error) {
+      if (error instanceof Error) {
+        setSubmitError(
+          mode === "edit"
+            ? "Failed to update client. Please try again."
+            : "Failed to create client. Please try again.",
+        );
+      }
+    }
   };
 
   return (
     <>
       <Modal title={mode === "edit" ? "Edit client" : "Add client info"} closeModal={closeModal}>
+        <div className="flex justify-center text-red-600">{submitError}</div>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-lg border border-gray-200 bg-white p-4">
             <p className="mb-3 text-xs font-bold uppercase text-gray-500">Client profile</p>
             <div className="flex flex-col gap-3">
               <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
                 Company
-                <input {...register("company", { required: "Company is required" })} placeholder="Acme Corp" />
+                <input
+                  {...register("company", { required: "Company is required" })}
+                  placeholder="Acme Corp"
+                />
               </label>
               {renderErrors("company")}
 
@@ -104,7 +119,10 @@ export const ClientFormModal = (props: Props) => {
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
                   Phone
-                  <input {...register("phone", { required: "Phone is required" })} placeholder="+1 415 555 0198" />
+                  <input
+                    {...register("phone", { required: "Phone is required" })}
+                    placeholder="+1 415 555 0198"
+                  />
                 </label>
 
                 <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
@@ -125,11 +143,7 @@ export const ClientFormModal = (props: Props) => {
             <button type="button" className="btnCancel" onClick={closeModal}>
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={!isDirty || isSubmitting}
-              className="btnSave"
-            >
+            <button type="submit" disabled={!isDirty || isSubmitting} className="btnSave">
               {mode === "edit" ? "Save Changes" : "Add info"}
             </button>
           </div>
