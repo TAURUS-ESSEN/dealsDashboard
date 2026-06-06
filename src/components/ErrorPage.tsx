@@ -20,7 +20,7 @@ export function ErrorPage() {
 
     return (
         <>
-            <div className="m-auto flex flex-col justify-center gap-2 items-center text-center py-40">
+            <div className="m-auto flex flex-col justify-center gap-2 items-center text-center py-40 text-orange-500">
                 <h2>Seite nicht gefunden. </h2>
                 <p>Du wirst automatisch in {seconds} Sekunden zur Startseite weitergeleitet.</p> 
                 <Link to='/' className="btn max-w-80">Jetzt zur Startseite gehen</Link>

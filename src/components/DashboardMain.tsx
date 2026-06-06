@@ -11,6 +11,7 @@ import type { ChangeEvent } from "react";
 import type { Filters, Presets } from "../types/ui";
 import type { DashboardRow } from "../types/dashboardRow";
 import type { User } from "../types/users";
+import type { InitialDataErrors } from "../types/api";
 
 type Props = {
   onPreset: (value: Presets) => void;
@@ -24,7 +25,9 @@ type Props = {
   sortColumn: string | null;
   isDetailsOpen: boolean;
   handleFiltersState: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  isLoading:boolean
+  isLoading: boolean;
+  loadingErrors: InitialDataErrors;
+  isBackgroundFetching: boolean;
 };
 
 export const DashboardMain = ({}: Props) => {
@@ -41,12 +44,13 @@ export const DashboardMain = ({}: Props) => {
     isDetailsOpen,
     users,
     isLoading,
+    loadingErrors,
+    isBackgroundFetching,
   }: Props = useOutletContext();
-  
+
   const { page, pageSize, totalPages, startIndex, endIndex, startItem, endItem, setPage, setPageSize } =
     usePagination({ totalItems: filteredData.length });
   const pageRows = filteredData.slice(startIndex, endIndex);
-  // const navigate = useNavigate();
 
   useEffect(() => {
     setPage(1);
@@ -72,7 +76,13 @@ export const DashboardMain = ({}: Props) => {
         <DashboardPresets onPreset={onPreset} filters={filters} />
         <DashboardSummary filteredData={filteredData} />
       </div>
-      <DashboardFilters onChangeFilters={handleFiltersState} filters={filters} users={users} />
+      <div className="flex justify-between items-center">
+        <DashboardFilters onChangeFilters={handleFiltersState} filters={filters} users={users} />
+        <div >
+          {isBackgroundFetching && <span className="text-sm text-slate-300">Refreshing...</span>}
+        </div>
+      </div>
+
       <DashboardTable
         filteredData={pageRows}
         activeRow={activeRow}
@@ -81,7 +91,8 @@ export const DashboardMain = ({}: Props) => {
         sortDirection={sortDirection}
         sortColumn={sortColumn}
         isCompact={isDetailsOpen}
-        isLoading = {isLoading}
+        isLoading={isLoading}
+        loadingErrors={loadingErrors}
       />
       <DashboardPagination
         page={page}

@@ -12,13 +12,14 @@ import { loadTasks } from "../normalized/normalizeTasks";
 import { useQuery } from "@tanstack/react-query";
 
 export const useLoadInitialData = () => {
-  const [errors, setErrors] = useState<InitialDataErrors>({});
+  const [loadingErrors, setLoadingErrors] = useState<InitialDataErrors>({});
 
   const {
     data: clients = [],
     error: clientsError,
     isError: isClientsError,
     isPending: clientsPending,
+    isFetching: clientsFetching,
   } = useQuery<Client[]>({
     queryKey: ["clients"],
     queryFn: loadClients,
@@ -29,7 +30,7 @@ export const useLoadInitialData = () => {
     error: dealsError,
     isError: isDealsError,
     isPending: dealsPending,
-    // isFetching,
+     isFetching: dealsFetching,
   } = useQuery<Deal[]>({
     queryKey: ["deals"],
     queryFn: loadDeals,
@@ -40,6 +41,7 @@ export const useLoadInitialData = () => {
     error: tasksError,
     isError: isTasksError,
     isPending: tasksPending,
+    isFetching: tasksFetching,
   } = useQuery<Task[]>({
     queryKey: ["tasks"],
     queryFn: loadTasks,
@@ -50,6 +52,7 @@ export const useLoadInitialData = () => {
     error: usersError,
     isError: isUsersError,
     isPending: usersPending,
+    isFetching: usersFetching,
   } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: loadUsers,
@@ -74,7 +77,7 @@ export const useLoadInitialData = () => {
       nextErrors.users = `Error by loading users data - ${usersError.message}`;
     }
 
-    setErrors(nextErrors);
+     setLoadingErrors(nextErrors);
   }, [
     isClientsError,
     clientsError,
@@ -87,13 +90,16 @@ export const useLoadInitialData = () => {
   ]);
  
   const isLoading = clientsPending || dealsPending || tasksPending || usersPending;
-  
+  const isFetching = clientsFetching || dealsFetching || tasksFetching || usersFetching
+  const isBackgroundFetching = !isLoading && isFetching;
+
   return {
-    errors,
+    loadingErrors,
     clients,
     users,
     deals,
     tasks,
     isLoading,
+    isBackgroundFetching
   };
 };

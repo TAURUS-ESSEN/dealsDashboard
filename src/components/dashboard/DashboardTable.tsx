@@ -1,7 +1,9 @@
 import { MoveUp, MoveDown } from "lucide-react";
 import type { DashboardRow } from "../../types/dashboardRow";
 import { ProbabilityBar } from "../Probability";
-import { DashboardLoading } from "./DashboardLoading";
+import { TableLoadingSkeleton } from "../TableLoadingSkeleton";
+import type { InitialDataErrors } from "../../types/api";
+
 type Props = {
   filteredData: DashboardRow[];
   onShow: (id: string) => void;
@@ -11,6 +13,7 @@ type Props = {
   sortColumn: string | null;
   isCompact: boolean;
   isLoading: boolean;
+  loadingErrors: InitialDataErrors;
 };
 
 export const DashboardTable = ({
@@ -22,6 +25,7 @@ export const DashboardTable = ({
   sortColumn,
   isCompact,
   isLoading,
+  loadingErrors,
 }: Props) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-300 bg-white">
@@ -104,12 +108,21 @@ export const DashboardTable = ({
           {isLoading && (
             <tr>
               <td colSpan={isCompact ? 7 : 8} className="px-4 py-8 text-center font-semibold text-slate-700">
-                <DashboardLoading />
+                <TableLoadingSkeleton />
               </td>
             </tr>
           )}
-
-          {!isLoading && filteredData.length === 0 && (
+          {Object.entries(loadingErrors).length !== 0 && (
+            <tr>
+              <td colSpan={isCompact ? 7 : 8}>
+                <div>Failed to load dashboard data</div>
+                {Object.entries(loadingErrors).map(([key, value]) => (
+                  <div key={key}>{value}</div>
+                ))}
+              </td>
+            </tr>
+          )}
+          {!isLoading && filteredData.length === 0 && Object.entries(loadingErrors).length === 0 && (
             <>
               <tr>
                 <td colSpan={isCompact ? 7 : 8}>No data. Change filter request.</td>
@@ -117,6 +130,7 @@ export const DashboardTable = ({
             </>
           )}
           {!isLoading &&
+            Object.entries(loadingErrors).length === 0 &&
             filteredData.length !== 0 &&
             filteredData.map((row) => (
               <tr

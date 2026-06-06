@@ -1,14 +1,12 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import type { ModalType } from "../types/ui";
-import type { User } from "../types/users";
 
 type Props = {
   openModal: (modalType: ModalType | null, id: null | string) => void;
-  users: User[];
 };
 import { Users, TriangleAlert, Plus, List } from "lucide-react";
 
-export const DashboardSidebar = ({ openModal, users }: Props) => {
+export const DashboardSidebar = ({ openModal}: Props) => {
   const location = useLocation();
   const actionByPath: Partial<
     Record<
@@ -32,11 +30,12 @@ export const DashboardSidebar = ({ openModal, users }: Props) => {
       modalType: "createUser",
     },
   };
-  const primaryAction = actionByPath[location.pathname]  
-  if (!primaryAction) return null
+  const primaryAction = actionByPath[location.pathname];
+  if (!primaryAction) return null;
 
   return (
     <div className="bg-[#192026] text-white   w-45 px-3 text-lg">
+
       <div className="mt-1 mb-4 text-center font-bold">
         <Link to="/">Pipeline CRM</Link>
       </div>

@@ -23,7 +23,7 @@ import { buildDetailedInfo } from "./features/Dashboard/buildDetailedInfo";
 // import { DebugInfo } from "./components/DebugInfo";
 
 export const App = () => {
-  const { errors, clients, users, deals, tasks, isLoading } = useLoadInitialData();
+  const { loadingErrors, clients, users, deals, tasks, isLoading, isBackgroundFetching } = useLoadInitialData();
   const { filters, handleFiltersState, sortBy, sortDirection, onPreset, sortColumn } = useFilters();
   const { toasts, createToast, removeToast } = useToasts();
   const { modal, openModal, closeModal } = useModal();
@@ -98,7 +98,7 @@ export const App = () => {
     <>
       <Toasts toasts={toasts} removeToast={removeToast} />
       <main className="flex gap-2 ">
-        <DashboardSidebar openModal={openModal} users={users} />
+        <DashboardSidebar openModal={openModal} />
         <Outlet
           context={{
             onPreset,
@@ -115,6 +115,8 @@ export const App = () => {
             isDetailsOpen,
             openModal,
             isLoading,
+            loadingErrors,
+            isBackgroundFetching
           }}
         />
         <DashboardDetails detailedInfo={detailedInfo} openModal={openModal} closeDetails={closeDetails} />

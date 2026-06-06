@@ -4,12 +4,20 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import "./index.css";
 import { App } from "./App.tsx";
-import { UsersList } from "./components/UsersList";
+import { UsersList } from "./components/users/UsersList";
 import { ClientsList } from "./components/ClientsList";
 import { ErrorPage } from "./components/ErrorPage";
 import { DashboardMain } from "./components/DashboardMain";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 const router = createBrowserRouter([
   {
     path: "/",

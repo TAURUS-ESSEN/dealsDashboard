@@ -1,6 +1,6 @@
-export const DashboardLoading = () => {
+export const TableLoadingSkeleton = () => {
   return (
-    <div className="w-full rounded-lg border border-gray-300 bg-white p-4">
+    <div className="w-full rounded-lg    bg-white p-4">
 
  
       <div className="space-y-2"> Loading dashboard data...
