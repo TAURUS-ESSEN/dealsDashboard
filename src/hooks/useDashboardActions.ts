@@ -1,7 +1,7 @@
 import type { Client, NewClient, NewClientToSave } from "../types/client";
 import { createClientApi, editClientApi } from "../api/clientsApi";
 import type { Deal, DealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
-import type { NewTaskToSave, Task } from "../types/tasks";
+import type { TaskSubmitFormData , Task } from "../types/tasks";
 import { editDealApi, createDealApi, deleteDealApi } from "../api/dealsApi";
 import type { DetailedInfo, ToastType } from "../types/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -133,8 +133,8 @@ export const useDashboardActions = ({
     }
   };
 
-  const handleTaskInfo = async (id: string | null, task: Task | NewTaskToSave): Promise<void> => {
-    const data = mapTaskToSaveData(task as Task);
+  const handleTaskInfo = async (id: string | null, task: TaskSubmitFormData ): Promise<void> => {
+    const data = mapTaskToSaveData(task);
     let toastMessage = "Task successfully updated";
     let toastType: ToastType = "update";
 

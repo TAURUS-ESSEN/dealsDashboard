@@ -1,5 +1,5 @@
 import type { ClientFallback, EmptyClient } from "../types/client";
-import type { EmptyTask, NewTaskToSave } from "../types/tasks";
+import type { TaskFormState } from "../types/tasks";
 import type { UserFallback } from "../types/users";
 import type { TaskFallback } from "../types/tasks";
 import type { UserFormState } from "../types/users";
@@ -50,14 +50,9 @@ export const tasksDefaultFallback: TaskFallback = {
   overdueTaskCount: 0,
 };
 
-export const emptyTaskFallback: EmptyTask = {
-  taskKey: null,
-  clientKey: "",
-  dealKey: "",
-  assigneeKey: "",
+export const defaultTaskState: TaskFormState = {
   title: "",
   status: "unknown",
   priority: "low",
   dueDate: "",
-  createdAt: "",
 };

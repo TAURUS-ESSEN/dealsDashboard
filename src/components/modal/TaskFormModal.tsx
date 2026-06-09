@@ -1,12 +1,15 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { nanoid } from "nanoid";
+import { tasksFormSchema } from "../../types/tasks";
+import { mapTaskToFormState } from "../../utils/mapToApiData";
 
-import { emptyTaskFallback } from "../../constants/fallBacks";
+import { defaultTaskState } from "../../constants/fallBacks";
 import { Modal } from "./Modal";
 
 import type { DashboardRow } from "../../types/dashboardRow";
-import type { Task, NewTaskToSave, EmptyTask } from "../../types/tasks";
+import type { Task, TaskFormState, TaskSubmitFormData } from "../../types/tasks";
 import { VALID_TASK_PRIORITY, VALID_TASK_STATUSES } from "../../constants/defaults";
 import { createRenderErrors } from "../../utils/renderErrors";
 
@@ -15,18 +18,18 @@ type Props =
       closeModal: () => void;
       mode: "edit";
       task: Task;
-      onSave: (id: string | null, task: NewTaskToSave | Task) => Promise<void>;
+      onSave: (id: string | null, task: TaskSubmitFormData) => Promise<void>;
     }
   | {
       closeModal: () => void;
       mode: "create";
-      onSave: (id: string | null, task: NewTaskToSave | Task) => Promise<void>;
+      onSave: (id: string | null, task: TaskSubmitFormData) => Promise<void>;
       row: DashboardRow;
     };
 
 export const TaskFormModal = (props: Props) => {
   const { closeModal, mode, onSave } = props;
-  const formData: Task | EmptyTask = mode === "edit" ? props.task : emptyTaskFallback;
+  const formData: TaskFormState = mode === "edit" ? mapTaskToFormState(props.task) : defaultTaskState;
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
@@ -34,24 +37,25 @@ export const TaskFormModal = (props: Props) => {
     handleSubmit,
     reset,
     formState: { errors, isDirty, isSubmitting, isValid },
-  } = useForm<Task | EmptyTask>({ mode: "onTouched" });
+  } = useForm<TaskFormState>({ mode: "onTouched", resolver: zodResolver(tasksFormSchema) });
 
   useEffect(() => {
     reset(formData);
-  }, []);
+  }, [reset]);
 
-  const onSubmit = async (data: Task | EmptyTask) => {
+  const onSubmit = async (data: TaskFormState) => {
     const id = mode === "edit" ? props.task.id : null;
+    const task: TaskSubmitFormData = {
+      ...data,
+      taskKey: mode === "create" ? `task_${nanoid(8)}` : props.task.taskKey,
+      createdAt: mode === "create" ? new Date().toISOString().slice(0, 10) : props.task.createdAt,
+      dealKey: mode === "create" ? props.row.dealKey : props.task.dealKey,
+      clientKey: mode === "create" ? props.row.clientKey : props.task.clientKey,
+      assigneeKey: mode === "create" ? props.row.ownerKey : props.task.assigneeKey,
+    };
 
-    if (mode === "create") {
-      data.taskKey = `task_${nanoid(8)}`;
-      data.createdAt = new Date().toISOString().slice(0, 10);
-      data.dealKey = props.row.dealKey;
-      data.clientKey = props.row.clientKey;
-      data.assigneeKey = props.row.ownerKey;
-    }
     try {
-      await onSave(id, data as Task);
+      await onSave(id, task);
       closeModal();
     } catch (errors) {
       if (errors instanceof Error) {
@@ -64,7 +68,7 @@ export const TaskFormModal = (props: Props) => {
     }
   };
 
-  const renderErrors = createRenderErrors<EmptyTask>(errors);
+  const renderErrors = createRenderErrors<TaskFormState>(errors);
 
   return (
     <Modal title={mode === "edit" ? "Edit task" : "Create task"} closeModal={closeModal}>

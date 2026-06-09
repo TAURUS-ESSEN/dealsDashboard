@@ -1,6 +1,6 @@
 import type { Client, ClientToSave, NewClientToSave } from "../types/client";
 import type { Deal, DealToSave, NewDealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
-import type { Task, TaskToSave } from "../types/tasks";
+import type { Task, TaskToSave, TaskSubmitFormData , TaskFormState } from "../types/tasks";
 import { nanoid } from "nanoid";
 import { User, UserToSave, NewUserToSave, UserSubmitData, UserFormState } from "../types/users";
 
@@ -96,19 +96,19 @@ export const mapNewDealWithClientToSaveData = (deal: NewDealFormState): DealWith
   };
 };
 
-export const mapTaskToSaveData = (task: Task): TaskToSave => {
-  const { issues, meta, ...rest } = task;
+export const mapTaskToSaveData = (task: TaskSubmitFormData ): TaskToSave => {
+  // const { issues, meta, ...rest } = task;
   const taskToApi: TaskToSave = {
-    ...rest,
-    taskKey: rest.taskKey ?? "",
-    clientKey: rest.clientKey ?? "",
-    dealKey: rest.dealKey ?? "",
-    assigneeKey: rest.assigneeKey ?? "",
-    title: rest.title ?? "",
-    status: rest.status ?? "",
-    priority: rest.priority ?? "",
-    dueDate: rest.dueDate ?? "",
-    createdAt: rest.createdAt ?? "",
+    ...task,
+    taskKey: task.taskKey ?? "",
+    clientKey: task.clientKey ?? "",
+    dealKey: task.dealKey ?? "",
+    assigneeKey: task.assigneeKey ?? "",
+    title: task.title ?? "",
+    status: task.status ?? "",
+    priority: task.priority ?? "",
+    dueDate: task.dueDate ?? "",
+    createdAt: task.createdAt ?? "",
   };
   return taskToApi;
 };
@@ -144,4 +144,11 @@ export const mapUserToFormState = (user: User): UserFormState => ({
   role: user.role,
   email: user.email ?? "",
   active: user.active,
+});
+
+export const mapTaskToFormState = (task: Task): TaskFormState => ({
+  title: task.title,
+  priority: task.priority,
+  status: task.status,
+  dueDate: task.dueDate ?? "",
 });
