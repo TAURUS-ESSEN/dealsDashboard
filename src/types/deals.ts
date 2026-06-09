@@ -1,20 +1,24 @@
 import { VALID_DEAL_STAGES } from "../constants/defaults";
 import { NewClient, NewClientToSave } from "./client";
+import { z } from "zod";
 
-export interface RawDeal {
-  dealKey: string;
-  clientKey: string;
-  ownerKey: string;
-  title: string;
-  stage: string;
-  value: string;
-  probability: string;
-  expectedCloseDate: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-}
+export const rawDealSchema = z.object({
+  dealKey: z.string(),
+  clientKey: z.string(),
+  ownerKey: z.string(),
+  title: z.string(),
+  stage: z.string(),
+  value: z.string(),
+  probability: z.string(),
+  expectedCloseDate: z.string(),
+  description: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  id: z.string(),
+});
+
+export const rawDealsSchema = z.array(rawDealSchema);
+export type RawDeal = z.infer<typeof rawDealSchema>;
 
 export type DealToSave = RawDeal;
 export type NewDealToSave = Omit<Deal, "id" | "meta" | "issues" | "value" | "probability"> & {

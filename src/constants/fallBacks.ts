@@ -2,7 +2,7 @@ import type { ClientFallback, EmptyClient } from "../types/client";
 import type { EmptyTask, NewTaskToSave } from "../types/tasks";
 import type { UserFallback } from "../types/users";
 import type { TaskFallback } from "../types/tasks";
-import type { EmptyUser } from "../types/users";
+import type { UserFormState } from "../types/users";
 
 export const clientDefaultFallback: ClientFallback = {
   clientName: "Unknown",
@@ -26,12 +26,10 @@ export const emptyClient: EmptyClient = {
   notes: "",
 };
 
-export const emptyUser: EmptyUser = {
-  userKey: null,
+export const defaultUserFormState: UserFormState = {
   fullName: "",
   role: "",
-  email: null,
-  avatarUrl: "",
+  email: "",
   active: true,
 };
 

@@ -1,6 +1,6 @@
 import { mapUserToSaveData, mapNewUserToSaveData } from "../utils/mapToApiData";
 import { createUserApi, deleteUserApi, editUserApi } from "../api/usersApi";
-import type { EmptyUser, User } from "../types/users";
+import type { UserSubmitData } from "../types/users";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { ToastType } from "../types/ui";
@@ -27,13 +27,13 @@ export const useUserActions = ({ createToast }: Props) => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
 
-  const handleUser = async (data: User | EmptyUser): Promise<void> => {
+  const handleUser = async (id: string | null, data: UserSubmitData): Promise<void> => {
     let toastMessage = "";
     let toastType: ToastType = "update";
-    if ("id" in data) {
+    if (id !== null) {
       try {
-        const user = mapUserToSaveData(data as User);
-        await editUserMutation.mutateAsync({ id: user.id, updatedUser: user });
+        const user = mapUserToSaveData(data);
+        await editUserMutation.mutateAsync({ id, updatedUser: user });
         toastMessage = "Manager successfully updated";
       } catch (error) {
         createToast("Failed to update manager", "error");

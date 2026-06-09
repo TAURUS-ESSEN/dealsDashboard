@@ -1,53 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { mapUserToFormState } from "../../utils/mapToApiData";
 
 import { Modal } from "./Modal";
 
-import type { User, EmptyUser } from "../../types/users";
+import type { User, UserFormState, UserSubmitData } from "../../types/users";
 import { createRenderErrors } from "../../utils/renderErrors";
-import { emptyUser } from "../../constants/fallBacks";
+import { defaultUserFormState } from "../../constants/fallBacks";
+import { userFormSchema } from "../../types/users";
 
 type Props =
   | {
       closeModal: () => void;
       user: User;
       mode: "edit";
-      onSaveUser: (user: User | EmptyUser) => Promise<void>;
+      onSaveUser: (id: string | null, user: UserSubmitData) => Promise<void>;
     }
   | {
       closeModal: () => void;
       mode: "create";
-      onSaveUser: (user: User | EmptyUser) => Promise<void>;
+      onSaveUser: (id: string | null, user: UserSubmitData) => Promise<void>;
     };
 
 export const UserEditFormModal = (props: Props) => {
   const { closeModal, mode, onSaveUser } = props;
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const formData = mode === "edit" ? props.user : emptyUser;
+
+  const formData = useMemo<UserFormState>(() => {
+    return mode === "edit" ? mapUserToFormState(props.user) : defaultUserFormState;
+  }, [mode, mode === "edit" ? props.user : null]);
   const {
     register,
     reset,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<User | EmptyUser>({ mode: "onTouched" });
+  } = useForm<UserFormState>({ mode: "onTouched", resolver: zodResolver(userFormSchema) });
 
   useEffect(() => {
     reset(formData);
   }, [formData, reset]);
 
-  const onSubmit = async (data: User | EmptyUser) => {
+  const onSubmit = async (data: UserFormState) => {
+    const user: UserSubmitData = {
+      userKey: mode === "edit" ? props.user.userKey : null,
+      avatarUrl: "",
+      ...data,
+    };
+    const id = mode === "edit" ? props.user.id : null;
+
     try {
-      await onSaveUser(data);
+      await onSaveUser(id, user);
       setSubmitError(null);
       closeModal();
     } catch (errors) {
       if (errors instanceof Error) {
-        setSubmitError(mode === "edit" ? "Failed to update manager. Please try again." : "Failed to create manager. Please try again.");
+        setSubmitError(
+          mode === "edit"
+            ? "Failed to update manager. Please try again."
+            : "Failed to create manager. Please try again.",
+        );
       }
     }
   };
 
-  const renderErrors = createRenderErrors<User>(errors);
+  const renderErrors = createRenderErrors<UserFormState>(errors);
 
   return (
     <Modal title={`${mode === "edit" ? `Edit manager` : "Create manager"}`} closeModal={closeModal}>
@@ -66,31 +83,19 @@ export const UserEditFormModal = (props: Props) => {
 
           <label className="modalField">
             Full name
-            <input
-              {...register("fullName", { required: "Full name is required" })}
-              placeholder="Ivan Petrov"
-            />
+            <input {...register("fullName")} placeholder="Ivan Petrov" />
           </label>
           {renderErrors("fullName")}
 
           <div className="modalFieldGrid">
             <label className="modalField">
               Role
-              <input {...register("role", { required: "Role is required" })} placeholder="Sales Manager" />
+              <input {...register("role")} placeholder="Sales Manager" />
             </label>
 
             <label className="modalField">
               Email
-              <input
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[a-z0-9+_.-]+@[a-z0-9.-]+\.[a-z]{2,}$/i,
-                    message: "Not valid email",
-                  },
-                })}
-                placeholder="ivan.petrov@example.com"
-              />
+              <input {...register("email")} placeholder="ivan.petrov@example.com" />
             </label>
           </div>
           {renderErrors("role")}

@@ -1,17 +1,21 @@
 import { VALID_TASK_PRIORITY, VALID_TASK_STATUSES } from "../constants/defaults";
+import { z } from "zod";
 
-export interface RawTask {
-  taskKey: string;
-  clientKey: string;
-  dealKey: string;
-  assigneeKey: string;
-  title: string;
-  status: string;
-  priority: string;
-  dueDate: string;
-  createdAt: string;
-  id: string;
-}
+export const rawTaskSchema = z.object({
+  taskKey: z.string(),
+  clientKey: z.string(),
+  dealKey: z.string(),
+  assigneeKey: z.string(),
+  title: z.string(),
+  status: z.string(),
+  priority: z.string(),
+  dueDate: z.string(),
+  createdAt: z.string(),
+  id: z.string(),
+});
+
+export const rawTasksSchema = z.array(rawTaskSchema);
+export type RawTask = z.infer<typeof rawTaskSchema>;
 
 export type TaskStatuses = (typeof VALID_TASK_STATUSES)[number];
 export type TaskPriority = (typeof VALID_TASK_PRIORITY)[number];

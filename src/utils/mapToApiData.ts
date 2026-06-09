@@ -2,7 +2,7 @@ import type { Client, ClientToSave, NewClientToSave } from "../types/client";
 import type { Deal, DealToSave, NewDealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
 import type { Task, TaskToSave } from "../types/tasks";
 import { nanoid } from "nanoid";
-import { User, UserToSave, NewUserToSave, EmptyUser } from "../types/users";
+import { User, UserToSave, NewUserToSave, UserSubmitData, UserFormState } from "../types/users";
 
 export const mapClientToSaveData = (client: Client): ClientToSave => {
   const { issues, meta, ...rest } = client;
@@ -113,21 +113,20 @@ export const mapTaskToSaveData = (task: Task): TaskToSave => {
   return taskToApi;
 };
 
-export const mapUserToSaveData = (user: User): UserToSave => {
-  const { issues, ...rest } = user;
+export const mapUserToSaveData = (user: UserSubmitData): UserToSave => {
   const userToSave: UserToSave = {
-    ...rest,
-    userKey: rest.userKey ?? "",
-    fullName: rest.fullName ?? "",
-    role: rest.role ?? "",
-    email: rest.email ?? "",
-    avatarUrl: rest.avatarUrl ?? "",
-    active: String(rest.active),
+    ...user,
+    userKey: user.userKey ?? "",
+    fullName: user.fullName ?? "",
+    role: user.role ?? "",
+    email: user.email ?? "",
+    avatarUrl: user.avatarUrl ?? "",
+    active: String(user.active),
   };
   return userToSave;
 };
 
-export const mapNewUserToSaveData = (user: EmptyUser): NewUserToSave => {
+export const mapNewUserToSaveData = (user: UserSubmitData): NewUserToSave => {
   const userKey = `usr_${nanoid(8)}`;
   const newUserToSave: NewUserToSave = {
     userKey,
@@ -139,3 +138,10 @@ export const mapNewUserToSaveData = (user: EmptyUser): NewUserToSave => {
   };
   return newUserToSave;
 };
+
+export const mapUserToFormState = (user: User): UserFormState => ({
+  fullName: user.fullName,
+  role: user.role,
+  email: user.email ?? "",
+  active: user.active,
+});

@@ -1,20 +1,23 @@
 import { VALID_CLIENT_STATUSES } from "../constants/defaults";
-import { NewDealToSave } from "./deals";
+import { z } from "zod";
 
-export interface RawClient {
-  clientKey: string;
-  company: string;
-  industry: string;
-  status: string;
-  email: string;
-  phone: string;
-  ownerKey: string;
-  createdAt: string;
-  lastContactAt: string;
-  tags: string;
-  notes: string;
-  id: string;
-}
+export const rawClientSchema = z.object({
+  clientKey: z.string(),
+  company: z.string(),
+  industry: z.string(),
+  status: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  ownerKey: z.string(),
+  createdAt: z.string(),
+  lastContactAt: z.string(),
+  tags: z.string(),
+  notes: z.string(),
+  id: z.string(),
+});
+
+export const rawClientsSchema = z.array(rawClientSchema)
+export type RawClient = z.infer<typeof rawClientSchema>
 
 export type NewClientToSave = Omit<RawClient, "id">;
 export type ClientToSave = RawClient;
@@ -42,7 +45,7 @@ export interface Client {
   status: ClientStatus;
   email: string | null;
   phone: string;
-  ownerKey: string|null;
+  ownerKey: string | null;
   createdAt: string | null;
   lastContactAt: string | null;
   tags: string[];
@@ -55,7 +58,6 @@ export interface Client {
   };
   id: string;
 }
-
 
 export type ClientFallback = {
   clientName: string;
