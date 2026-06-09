@@ -1,18 +1,21 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Modal } from "./Modal";
 
 import type { User } from "../../types/users";
-import type { Deal } from "../../types/deals";
+import type { Deal, EditDealFormState, EditDealSubmit } from "../../types/deals";
+import { editDealSchema } from "../../types/deals";
 import { VALID_DEAL_STAGES } from "../../constants/defaults";
 import { createRenderErrors } from "../../utils/renderErrors";
+import { mapDealToFormState } from "../../utils/mapToApiData";
 
 type Props = {
   closeModal: () => void;
   deal: Deal;
   users: User[];
-  onUpdateDeal: (id: string, deal: Deal) => Promise<void>;
+  onUpdateDeal: (id: string, deal: EditDealSubmit) => Promise<void>;
 };
 
 export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Props) => {
@@ -21,16 +24,25 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
     reset,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<Deal>({ mode: "onTouched" });
+  } = useForm<EditDealFormState>({ mode: "onTouched", resolver: zodResolver(editDealSchema) });
+  const formData = mapDealToFormState(deal);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  useEffect(() => {
-    reset(deal);
-  }, []);
 
-  const onSubmit = async (data: Deal) => {
+  useEffect(() => {
+    reset(formData);
+  }, [formData, reset]);
+
+  const onSubmit = async (data: EditDealFormState) => {
+    const editedDeal: EditDealSubmit = {
+      ...data,
+      dealKey: deal.dealKey,
+      clientKey: deal.clientKey,
+      createdAt: deal.createdAt,
+      updatedAt: new Date().toISOString().slice(0, 10),
+      id: deal.id,
+    };
     try {
-      data.updatedAt = new Date().toISOString().slice(0, 10);
-      await onUpdateDeal(data.id, data);
+      await onUpdateDeal(editedDeal.id, editedDeal);
       closeModal();
     } catch (errors) {
       if (errors instanceof Error) {
@@ -39,11 +51,11 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
     }
   };
 
-  const renderErrors = createRenderErrors<Deal>(errors);
+  const renderErrors = createRenderErrors<EditDealFormState>(errors);
 
   return (
     <Modal title="Edit deal" closeModal={closeModal}>
-       <div className="flex justify-center text-red-600">{submitError}</div>
+      <div className="flex justify-center text-red-600">{submitError}</div>
 
       <form className="modalForm" onSubmit={handleSubmit(onSubmit)}>
         <div className="modalSection">
@@ -51,10 +63,7 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
           <div className="flex flex-col gap-3">
             <label className="modalField">
               Deal title
-              <input
-                {...register("title", { required: "Deal title is required" })}
-                placeholder="Enterprise CRM rollout"
-              />
+              <input {...register("title")} placeholder="Enterprise CRM rollout" />
             </label>
             {renderErrors("title")}
 
@@ -84,12 +93,7 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
 
               <label className="modalField">
                 Expected close
-                <input
-                  type="date"
-                  {...register("expectedCloseDate", {
-                    required: "Expected close date is required",
-                  })}
-                />
+                <input type="date" {...register("expectedCloseDate")} />
               </label>
             </div>
             {renderErrors("stage")}
@@ -102,20 +106,12 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
           <div className="modalFieldGrid">
             <label className="modalField">
               Value
-              <input
-                type="number"
-                {...register("value", { required: "Value is required", valueAsNumber: true })}
-                placeholder="42000"
-              />
+              <input type="number" {...register("value")} placeholder="42000" />
             </label>
 
             <label className="modalField">
               Probability
-              <input
-                type="number"
-                {...register("probability", { required: "Probability is required", valueAsNumber: true })}
-                placeholder="65"
-              />
+              <input type="number" {...register("probability")} placeholder="65" />
             </label>
           </div>
           {renderErrors("value")}

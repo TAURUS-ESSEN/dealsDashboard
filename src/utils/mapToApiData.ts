@@ -1,42 +1,54 @@
-import type { Client, ClientToSave, NewClientToSave } from "../types/client";
-import type { Deal, DealToSave, NewDealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
-import type { Task, TaskToSave, TaskSubmitFormData , TaskFormState } from "../types/tasks";
+import type {
+  Client,
+  ClientFormState,
+  ClientToSave,
+  NewClientToSave,
+  ClientSubmitData,
+} from "../types/client";
+import type {
+  Deal,
+  DealToSave,
+  NewDealToSave,
+  NewDealFormState,
+  DealWithClientToSave,
+  EditDealFormState,
+  EditDealSubmit,
+} from "../types/deals";
+import type { Task, TaskToSave, TaskSubmitFormData, TaskFormState } from "../types/tasks";
 import { nanoid } from "nanoid";
 import { User, UserToSave, NewUserToSave, UserSubmitData, UserFormState } from "../types/users";
+import { email } from "zod";
 
-export const mapClientToSaveData = (client: Client): ClientToSave => {
-  const { issues, meta, ...rest } = client;
+export const mapClientToSaveData = (client: ClientSubmitData): ClientToSave => {
+  // const { issues, meta, ...rest } = client;
   const clientToApi: ClientToSave = {
-    ...rest,
-    clientKey: rest.clientKey ?? "",
-    ownerKey: rest.ownerKey ?? "",
-    createdAt: rest.createdAt ?? "",
-    lastContactAt: rest.lastContactAt ?? "",
-    email: rest.email ?? meta.rawEmail ?? "",
-    tags: rest.tags.join(","),
+    ...client,
+    clientKey: client.clientKey ?? "",
+    ownerKey: client.ownerKey ?? "",
+    createdAt: client.createdAt ?? "",
+    lastContactAt: client.lastContactAt ?? "",
+    email: client.email ?? "",
+    tags: client.tags.join(","),
   };
   return clientToApi;
 };
 
-export const mapDealToSaveData = (deal: Deal): DealToSave => {
-  const { issues, meta, ...rest } = deal;
+export const mapDealToSaveData = (deal: EditDealSubmit): DealToSave => {
   const dealToApi: DealToSave = {
-    ...rest,
-    clientKey: rest.clientKey ?? "",
-    value: String(rest.value),
-    probability: String(rest.probability),
-    ownerKey: rest.ownerKey ?? "",
-    createdAt: rest.createdAt ?? "",
-    expectedCloseDate: rest.expectedCloseDate ?? "",
-    updatedAt: rest.updatedAt ?? "",
+    ...deal,
+    clientKey: deal.clientKey ?? "",
+    value: String(deal.value),
+    probability: String(deal.probability),
+    ownerKey: deal.ownerKey ?? "",
+    createdAt: deal.createdAt ?? "",
+    expectedCloseDate: deal.expectedCloseDate ?? "",
+    updatedAt: deal.updatedAt ?? "",
   };
   return dealToApi;
 };
 
 export const mapNewDealToSaveData = (deal: NewDealFormState): NewDealToSave => {
   const { clientType, ...rest } = deal;
-  //  deal.clientKey = `cl_${nanoid(8)}`;
-  // }
   deal.dealKey = `deal_${nanoid(8)}`;
   deal.createdAt = new Date().toISOString().slice(0, 10);
   deal.updatedAt = null;
@@ -96,7 +108,7 @@ export const mapNewDealWithClientToSaveData = (deal: NewDealFormState): DealWith
   };
 };
 
-export const mapTaskToSaveData = (task: TaskSubmitFormData ): TaskToSave => {
+export const mapTaskToSaveData = (task: TaskSubmitFormData): TaskToSave => {
   // const { issues, meta, ...rest } = task;
   const taskToApi: TaskToSave = {
     ...task,
@@ -151,4 +163,24 @@ export const mapTaskToFormState = (task: Task): TaskFormState => ({
   priority: task.priority,
   status: task.status,
   dueDate: task.dueDate ?? "",
+});
+
+export const mapDealToFormState = (deal: Deal): EditDealFormState => ({
+  title: deal.title,
+  ownerKey: deal.ownerKey,
+  stage: deal.stage,
+  value: deal.value,
+  probability: deal.probability,
+  expectedCloseDate: deal.expectedCloseDate ?? "",
+  description: deal.description,
+});
+
+export const mapClientToFormState = (client: Client): ClientFormState => ({
+  company: client.company,
+  industry: client.industry,
+  status: client.status,
+  email: client.email ?? "",
+  phone: client.phone,
+  lastContactAt: client.lastContactAt ?? "",
+  notes: client.notes,
 });

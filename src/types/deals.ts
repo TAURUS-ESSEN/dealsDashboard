@@ -65,3 +65,16 @@ export type DealWithClientToSave = {
   newClient: NewClientToSave;
   newDeal: NewDealToSave;
 };
+
+export const editDealSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").min(2, "Title must be at least 2 characters"),
+  ownerKey: z.string(),
+  stage: z.enum(VALID_DEAL_STAGES),
+  value: z.number(),
+  probability: z.number(),
+  expectedCloseDate: z.iso.date("date is required"),
+  description: z.string(),
+});
+
+export type EditDealFormState = z.infer<typeof editDealSchema>
+export type EditDealSubmit = Omit<Deal, 'issues' | 'meta'>

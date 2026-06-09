@@ -1,4 +1,4 @@
-import type { ClientFallback, EmptyClient } from "../types/client";
+import type { ClientFallback, ClientFormState } from "../types/client";
 import type { TaskFormState } from "../types/tasks";
 import type { UserFallback } from "../types/users";
 import type { TaskFallback } from "../types/tasks";
@@ -12,17 +12,13 @@ export const clientDefaultFallback: ClientFallback = {
   clientIndustry: "unknown",
 };
 
-export const emptyClient: EmptyClient = {
-  clientKey: null,
+export const defaultClientState: ClientFormState = {
   company: "",
   industry: "",
   status: "unknown",
-  email: null,
+  email: "",
   phone: "",
-  ownerKey: "unknown",
-  createdAt: null,
-  lastContactAt: null,
-  tags: [],
+  lastContactAt: "",
   notes: "",
 };
 

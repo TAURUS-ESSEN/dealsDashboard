@@ -1,7 +1,7 @@
-import type { Client, NewClient, NewClientToSave } from "../types/client";
+import type { ClientSubmitData } from "../types/client";
 import { createClientApi, editClientApi } from "../api/clientsApi";
-import type { Deal, DealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
-import type { TaskSubmitFormData , Task } from "../types/tasks";
+import type { EditDealSubmit, DealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
+import type { TaskSubmitFormData } from "../types/tasks";
 import { editDealApi, createDealApi, deleteDealApi } from "../api/dealsApi";
 import type { DetailedInfo, ToastType } from "../types/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -67,7 +67,7 @@ export const useDashboardActions = ({
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
-  const handleSaveClient = async (id: string | null, client: Client | NewClient): Promise<void> => {
+  const handleSaveClient = async (id: string | null, client: ClientSubmitData): Promise<void> => {
     let toastMessage = "";
     let toastType: ToastType = "update";
 
@@ -75,7 +75,7 @@ export const useDashboardActions = ({
       if (!detailedInfo?.deal || !client.clientKey) return;
 
       try {
-        await createClientMutation.mutateAsync(client as NewClientToSave);
+        await createClientMutation.mutateAsync(mapClientToSaveData(client));
         const updatedDeal = {
           ...detailedInfo.deal,
           clientKey: client.clientKey,
@@ -91,7 +91,7 @@ export const useDashboardActions = ({
       }
     } else {
       try {
-        const data = mapClientToSaveData(client as Client);
+        const data = mapClientToSaveData(client);
         await editClientMutation.mutateAsync({ id, updatedClient: data });
         toastMessage = "Client successfully updated";
       } catch (error) {
@@ -122,9 +122,9 @@ export const useDashboardActions = ({
     }
   };
 
-  const handleUpdateDeal = async (id: string, deal: Deal): Promise<void> => {
+  const handleUpdateDeal = async (id: string, deal: EditDealSubmit): Promise<void> => {
     try {
-      const data = mapDealToSaveData(deal as Deal);
+      const data = mapDealToSaveData(deal);
       await editDealMutation.mutateAsync({ id, updatedDeal: data });
       createToast("Deal successfully updated", "update");
     } catch (error) {
@@ -133,7 +133,7 @@ export const useDashboardActions = ({
     }
   };
 
-  const handleTaskInfo = async (id: string | null, task: TaskSubmitFormData ): Promise<void> => {
+  const handleTaskInfo = async (id: string | null, task: TaskSubmitFormData): Promise<void> => {
     const data = mapTaskToSaveData(task);
     let toastMessage = "Task successfully updated";
     let toastType: ToastType = "update";

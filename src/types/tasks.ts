@@ -55,15 +55,11 @@ export type TaskFallback = {
 
 export type TaskToSave = Omit<RawTask, "id">;
 export const tasksFormSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "Title is required")
-    .min(2, "Title must be at least 2 characters"),
-   priority: z.enum(VALID_TASK_PRIORITY),
+  title: z.string().trim().min(1, "Title is required").min(2, "Title must be at least 2 characters"),
+  priority: z.enum(VALID_TASK_PRIORITY),
   status: z.enum(VALID_TASK_STATUSES),
   dueDate: z.iso.date("date is required"),
 });
 
 export type TaskFormState = z.infer<typeof tasksFormSchema>;
-export type TaskSubmitFormData = Omit<Task, 'issues' | 'meta' | 'id'> 
+export type TaskSubmitFormData = Omit<Task, "issues" | "meta" | "id">;

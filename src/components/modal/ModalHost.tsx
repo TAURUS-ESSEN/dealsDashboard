@@ -1,7 +1,7 @@
 import type { DetailedInfo, Modal } from "../../types/ui";
-import type { NewClient, Client } from "../../types/client";
+import type { ClientSubmitData, Client } from "../../types/client";
 import type { User, UserSubmitData } from "../../types/users";
-import type { Deal, NewDealFormState } from "../../types/deals";
+import type { EditDealSubmit, NewDealFormState } from "../../types/deals";
 import type { TaskSubmitFormData } from "../../types/tasks";
 
 import { ClientFormModal } from "./ClientFormModal";
@@ -17,9 +17,9 @@ type Props = {
   detailedInfo: DetailedInfo | null;
   users: User[];
   clients: Client[];
-  onSaveClient: (id: string | null, client: NewClient | Client) => Promise<void>;
+  onSaveClient: (id: string | null, client: ClientSubmitData) => Promise<void>;
   onSaveTask: (id: string | null, task: TaskSubmitFormData) => Promise<void>;
-  onUpdateDeal: (id: string, deal: Deal) => Promise<void>;
+  onUpdateDeal: (id: string, deal: EditDealSubmit) => Promise<void>;
   onSaveUser: (id: string | null, user: UserSubmitData) => Promise<void>;
   onCreateDeal: (data: NewDealFormState) => Promise<void>;
   onDelete: (id: string, mode: "deal" | "task") => Promise<void>;

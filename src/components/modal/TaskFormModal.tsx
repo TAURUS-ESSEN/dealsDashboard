@@ -41,7 +41,7 @@ export const TaskFormModal = (props: Props) => {
 
   useEffect(() => {
     reset(formData);
-  }, [reset]);
+  }, [formData, reset]);
 
   const onSubmit = async (data: TaskFormState) => {
     const id = mode === "edit" ? props.task.id : null;
@@ -79,10 +79,7 @@ export const TaskFormModal = (props: Props) => {
           <div className="flex flex-col gap-3">
             <label className="modalField">
               Task title
-              <input
-                {...register("title", { required: "Task title required" })}
-                placeholder="Send revised proposal"
-              />
+              <input {...register("title")} placeholder="Send revised proposal" />
             </label>
             {renderErrors("title")}
 
@@ -110,7 +107,7 @@ export const TaskFormModal = (props: Props) => {
 
             <label className="modalField">
               Due date
-              <input type="date" {...register("dueDate", { required: "Due date is required" })} />
+              <input type="date" {...register("dueDate")} />
             </label>
             {renderErrors("dueDate")}
           </div>

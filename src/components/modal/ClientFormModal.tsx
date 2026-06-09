@@ -1,54 +1,65 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { emptyClient } from "../../constants/fallBacks";
+import { useState, useMemo } from "react";
+import { defaultClientState } from "../../constants/fallBacks";
 import { nanoid } from "nanoid";
 import { Modal } from "./Modal";
 import { useEffect } from "react";
-import type { Client, NewClient, EmptyClient } from "../../types/client";
-import { VALID_CLIENT_STATUSES } from "../../constants/defaults";
+import {
+  type Client,
+  type ClientFormState,
+  type ClientSubmitData,
+  clientFormSchema,
+} from "../../types/client";
+
 import { createRenderErrors } from "../../utils/renderErrors";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { mapClientToFormState } from "../../utils/mapToApiData";
+import { ClientFields } from "./ClientFields";
 
 type Props =
   | {
       closeModal: () => void;
       mode: "create";
-      onSave: (id: string | null, client: NewClient | Client) => Promise<void>;
+      onSave: (id: string | null, client: ClientSubmitData) => Promise<void>;
     }
   | {
       closeModal: () => void;
       mode: "edit";
       client: Client;
-      onSave: (id: string | null, client: NewClient | Client) => Promise<void>;
+      onSave: (id: string | null, client: ClientSubmitData) => Promise<void>;
     };
 
 export const ClientFormModal = (props: Props) => {
   const { closeModal, mode, onSave } = props;
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const formData = mode === "edit" ? props.client : emptyClient;
+  const formData = useMemo<ClientFormState>(() => {
+    return mode === "edit" ? mapClientToFormState(props.client) : defaultClientState;
+  }, [mode, mode === "edit" ? props.client : null]);
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting, isValid },
+    formState: { errors, isDirty, isSubmitting },
     reset,
-  } = useForm<EmptyClient | Client>({ mode: "onTouched" });
+  } = useForm<ClientFormState>({ mode: "onTouched", resolver: zodResolver(clientFormSchema) });
 
   useEffect(() => {
     reset(formData);
-  }, []);
+  }, [formData, reset]);
 
-  const renderErrors = createRenderErrors<EmptyClient>(errors);
+  const renderErrors = createRenderErrors<ClientFormState>(errors);
 
-  const onSubmit = async (data: EmptyClient | Client) => {
+  const onSubmit = async (data: ClientFormState) => {
     const id = mode === "edit" && props.client ? props.client.id : null;
+    const clientToSave: ClientSubmitData = {
+      ...data,
+      clientKey: mode === "create" ? `cl_${nanoid(8)}` : (props.client.clientKey ?? ""),
+      ownerKey: mode === "create" ? "" : (props.client.ownerKey ?? ""),
+      createdAt: mode === "create" ? new Date().toISOString().slice(0, 10) : (props.client.createdAt ?? ""),
+      tags: mode === "create" ? [] : (props.client.tags ?? []),
+    };
 
-    if (mode === "create") {
-      data.clientKey = `cl_${nanoid(8)}`;
-      data.ownerKey = "";
-      data.createdAt = new Date().toISOString().slice(0, 10);
-      data.tags = [];
-    }
     try {
-      await onSave(id, data as Client);
+      await onSave(id, clientToSave);
       closeModal();
     } catch (error) {
       if (error instanceof Error) {
@@ -66,78 +77,7 @@ export const ClientFormModal = (props: Props) => {
       <Modal title={mode === "edit" ? "Edit client" : "Add client info"} closeModal={closeModal}>
         <div className="flex justify-center text-red-600">{submitError}</div>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <p className="mb-3 text-xs font-bold uppercase text-gray-500">Client profile</p>
-            <div className="flex flex-col gap-3">
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                Company
-                <input
-                  {...register("company", { required: "Company is required" })}
-                  placeholder="Acme Corp"
-                />
-              </label>
-              {renderErrors("company")}
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Industry
-                  <input {...register("industry", { required: "Industry is required" })} placeholder="SaaS" />
-                </label>
-
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Status
-                  <select {...register("status", { required: "Status is required" })}>
-                    {VALID_CLIENT_STATUSES.map((status) => (
-                      <option key={status}>{status}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              {renderErrors("industry")}
-              {renderErrors("status")}
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <p className="mb-3 text-xs font-bold uppercase text-gray-500">Contact</p>
-            <div className="flex flex-col gap-3">
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                Email
-                <input
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[a-z0-9+_.-]+@[a-z0-9.-]+\.[a-z]{2,}$/i,
-                      message: "Not valid Email",
-                    },
-                  })}
-                  placeholder="contact@acme.io"
-                />
-              </label>
-              {renderErrors("email")}
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Phone
-                  <input
-                    {...register("phone", { required: "Phone is required" })}
-                    placeholder="+1 415 555 0198"
-                  />
-                </label>
-
-                <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                  Last contact
-                  <input type="date" {...register("lastContactAt")} />
-                </label>
-              </div>
-              {renderErrors("phone")}
-
-              <label className="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-                Notes
-                <textarea {...register("notes")} placeholder="Notes" rows={3} />
-              </label>
-            </div>
-          </div>
+          <ClientFields register={register} renderErrors={renderErrors} />
 
           <div className="sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t border-gray-200 bg-slate-50 px-4 py-3">
             <button type="button" className="btnCancel" onClick={closeModal}>
