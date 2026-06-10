@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -25,7 +25,9 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<EditDealFormState>({ mode: "onTouched", resolver: zodResolver(editDealSchema) });
-  const formData = mapDealToFormState(deal);
+  const formData = useMemo<EditDealFormState>(() => {
+    return mapDealToFormState(deal);
+  }, [deal]);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -106,12 +108,12 @@ export const DealEditFormModal = ({ closeModal, deal, users, onUpdateDeal }: Pro
           <div className="modalFieldGrid">
             <label className="modalField">
               Value
-              <input type="number" {...register("value")} placeholder="42000" />
+              <input type="number" {...register("value", { valueAsNumber: true })} placeholder="42000" />
             </label>
 
             <label className="modalField">
               Probability
-              <input type="number" {...register("probability")} placeholder="65" />
+              <input type="number" {...register("probability", { valueAsNumber: true })} placeholder="65" />
             </label>
           </div>
           {renderErrors("value")}

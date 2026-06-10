@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { nanoid } from "nanoid";
 import { tasksFormSchema } from "../../types/tasks";
@@ -29,7 +29,10 @@ type Props =
 
 export const TaskFormModal = (props: Props) => {
   const { closeModal, mode, onSave } = props;
-  const formData: TaskFormState = mode === "edit" ? mapTaskToFormState(props.task) : defaultTaskState;
+  const formData = useMemo<TaskFormState>(() => {
+    return mode === "edit" ? mapTaskToFormState(props.task) : defaultTaskState;
+  }, [mode, mode === "edit" ? props.task : null]);
+
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {

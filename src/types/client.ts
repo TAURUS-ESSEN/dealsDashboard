@@ -68,10 +68,6 @@ export type ClientFallback = {
   clientIndustry: string;
 };
 
-// export type NewClient = Omit<Client, "id" | "meta" | "issues" | "tags"> & {
-//   tags: string;
-// };
-
 export const clientFormSchema = z.object({
   company: z.string().trim().min(1, "Company is required").min(2, "Company must be at least 2 characters"),
   industry: z.string().trim().min(1, "Industry is required").min(2, "Industry must be at least 2 characters"),
@@ -85,4 +81,4 @@ export type ClientFormState = z.infer<typeof clientFormSchema>;
 
 export type ClientSubmitData = Omit<RawClient, "id" | "tags"> & {
   tags: string[];
-} ;
+};

@@ -4,10 +4,12 @@ type FieldError = {
   message?: string;
 };
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+
 export function createRenderErrors<T extends object>(
-  errors: Partial<Record<keyof T, FieldError>>
+  errors: Partial<Record<KeysOfUnion<T>, FieldError>>
 ) {
-  return function renderErrors(name: keyof T): ReactNode | null {
+  return function renderErrors(name: KeysOfUnion<T>): ReactNode | null {
     const error = errors[name];
 
     if (!error?.message) return null;

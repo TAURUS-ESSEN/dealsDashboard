@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState} from "react";
 import type { Client } from "../types/client";
 import type { User } from "../types/users";
 import type { Deal } from "../types/deals";

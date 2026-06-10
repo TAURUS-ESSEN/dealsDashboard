@@ -1,6 +1,6 @@
 import type { ClientSubmitData } from "../types/client";
 import { createClientApi, editClientApi } from "../api/clientsApi";
-import type { EditDealSubmit, DealToSave, NewDealFormState, DealWithClientToSave } from "../types/deals";
+import type { EditDealSubmit, DealToSave, CreateDealFormState, DealWithClientToSave } from "../types/deals";
 import type { TaskSubmitFormData } from "../types/tasks";
 import { editDealApi, createDealApi, deleteDealApi } from "../api/dealsApi";
 import type { DetailedInfo, ToastType } from "../types/ui";
@@ -103,10 +103,10 @@ export const useDashboardActions = ({
     createToast(toastMessage, toastType);
   };
 
-  const handleCreateDeal = async (data: NewDealFormState): Promise<void> => {
+  const handleCreateDeal = async (data: CreateDealFormState): Promise<void> => {
     try {
       if (data.clientType === "old") {
-        const deal = mapNewDealToSaveData(data as NewDealFormState);
+        const deal = mapNewDealToSaveData(data);
         await createDealMutation.mutateAsync(deal);
       }
       if (data.clientType === "new") {
