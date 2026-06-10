@@ -16,6 +16,7 @@ The app simulates a small sales pipeline system. Deals, clients, tasks and manag
 
 - Deals dashboard with table, summary cards and details panel
 - Dirty API data normalization before usage
+- Zod validation for raw API responses and form data
 - Derived dashboard rows assembled from deals, clients, managers and tasks
 - Deal create, edit and delete flows
 - Client edit and missing-client creation flow
@@ -35,6 +36,8 @@ The app simulates a small sales pipeline system. Deals, clients, tasks and manag
 - Vite
 - Tailwind CSS
 - React Hook Form
+- Zod
+- TanStack Query
 - React Router
 - Lucide React
 - MockAPI
@@ -58,10 +61,12 @@ MockAPI
 Important project boundaries:
 
 - Raw API data is not stored in React state
+- Raw API responses are validated with Zod before normalization
 - State stores normalized entities
 - Forms do not call API directly
+- Forms use Zod schemas with React Hook Form
 - Forms call callbacks provided by the app layer
-- Action hooks handle mapping, API calls and data refresh
+- Action hooks handle mapping, TanStack Query mutations and data refresh
 - `DashboardRow` is not an API entity, it is a view model assembled from several entities
 
 ## Project Structure
